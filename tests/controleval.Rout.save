@@ -1,0 +1,104 @@
+
+R Under development (unstable) (2012-07-27 r60013) -- "Unsuffered Consequences"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: i686-pc-linux-gnu (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> require(bbmle)
+Loading required package: bbmle
+> mle2a <- function(...)
++   mle2(...)
+> 
+> mle2b <- function(...)
++   mle2a(...)
+> 
+> ## some data
+> d <- data.frame(x=0:10,y=c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8))
+> ym <- mean(d$y)
+> 
+> ## some fits
+> 
+> (fit0 <- mle2(y~dpois(lambda=ymean),start=list(ymean=ym),data=d)) # okay
+
+Call:
+mle2(minuslogl = y ~ dpois(lambda = ymean), start = list(ymean = ym), 
+    data = d)
+
+Coefficients:
+   ymean 
+11.54545 
+
+Log-likelihood: -42.73 
+> predict(fit0)
+[1] 11.54545
+> (fit0.2 <- mle2(y~dpois(lambda=ymean),start=list(ymean=ym),data=d,
++                 control=list(parscale=2))) # okay
+
+Call:
+mle2(minuslogl = y ~ dpois(lambda = ymean), start = list(ymean = ym), 
+    data = d, control = list(parscale = 2))
+
+Coefficients:
+   ymean 
+11.54545 
+
+Log-likelihood: -42.73 
+> predict(fit0.2)
+[1] 11.54545
+> (fit1 <- mle2a(y~dpois(lambda=ymean),start=list(ymean=ym),data=d)) # okay
+
+Call:
+mle2(minuslogl = ..1, start = ..2, data = ..3)
+
+Coefficients:
+   ymean 
+11.54545 
+
+Log-likelihood: -42.73 
+> (fit1.2 <- mle2a(y~dpois(lambda=ymean),start=list(ymean=ym),data=d,
++                  control=list(parscale=2))) # FAILS
+
+Call:
+mle2(minuslogl = ..1, start = ..2, data = ..3, control = ..4)
+
+Coefficients:
+   ymean 
+11.54545 
+
+Log-likelihood: -42.73 
+> (fit1.3 <- mle2b(y~dpois(lambda=ymean),start=list(ymean=ym),data=d,
++                  control=list(parscale=2))) # FAILS
+
+Call:
+mle2(minuslogl = ..1, start = ..2, data = ..3, control = ..4)
+
+Coefficients:
+   ymean 
+11.54545 
+
+Log-likelihood: -42.73 
+> 
+> ### NOT WORKING:
+> if (FALSE) {
++   predict(fit1)
++   predict(fit1.2)
++   predict(fit1.3)
++ }
+> 
+> proc.time()
+   user  system elapsed 
+  0.736   1.076   1.638 

@@ -1,0 +1,114 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(bbmle)
+Loading required package: stats4
+Loading required package: numDeriv
+> 
+> funcresp <-
++ structure(list(Initial = as.integer(c(5, 5, 10, 10, 15, 15, 20, 
++ 20, 30, 30, 50, 50, 75, 75, 100, 100)), Killed = as.integer(c(1, 
++ 2, 5, 6, 10, 9, 7, 10, 11, 15, 5, 21, 32, 18, 25, 35))), .Names = c("Initial", 
++ "Killed"), class = "data.frame", row.names = c("1", "2", "3", 
++ "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", 
++ "16"))
+> 
+> attach(funcresp)
+> 
+> binomNLL2 = function(p) {
++   a = p[1]
++   h = p[2]
++   ##  cat(a,h,"\n")
++   p = a/(1+a*h*N)
++   -sum(dbinom(k,prob=p,size=N,log=TRUE))
++ }
+> 
+> N=0; k=0
+> parnames(binomNLL2) = c("a","h")
+> m2a = mle2(binomNLL2,start=c(a=0.5,h=0.0125),
++   data=list(N=Initial,k=Killed))
+> p1a = profile(m2a); p1a
+There were 50 or more warnings (use warnings() to see the first 50)
+Likelihood profile:
+
+$a
+            z   par.vals.a   par.vals.h
+1  -4.2047344  0.294898645 -0.002923466
+2  -3.1552066  0.341179554  0.002586064
+3  -2.2351038  0.387460464  0.007009828
+4  -1.4145435  0.433741374  0.010694613
+5  -0.6726261  0.480022283  0.013859302
+6   0.0000000  0.526303193  0.016643616
+7   0.6321738  0.572584102  0.019113307
+8   1.2156051  0.618865012  0.021399150
+9   1.7630606  0.665145921  0.023494921
+10  2.2804928  0.711426831  0.025475099
+11  2.7729144  0.757707740  0.027355948
+12  3.2447726  0.803988650  0.029170757
+13  3.7001523  0.850269559  0.030945274
+
+$h
+            z    par.vals.a    par.vals.h
+1  -3.7637543  0.3268572493 -0.0024273676
+2  -3.1748327  0.3542640536  0.0007511297
+3  -2.5644438  0.3843760379  0.0039296269
+4  -1.9359396  0.4170494900  0.0071081242
+5  -1.2938745  0.4519556085  0.0102866214
+6  -0.6437592  0.4886001613  0.0134651187
+7   0.0000000  0.5263031926  0.0166436159
+8   0.6563173  0.5646512092  0.0198221132
+9   1.2951023  0.6028512247  0.0230006104
+10  1.9201220  0.6405127788  0.0261791077
+11  2.5281012  0.6773052997  0.0293576049
+12  3.1168240  0.7130175259  0.0325361022
+13  3.6849884  0.7475421634  0.0357145994
+
+> c2a = confint(p1a); c2a
+        2.5 %     97.5 %
+a 0.402495803 0.68249529
+h 0.006987227 0.02638541
+> 
+> binomNLL2b = function(p,N,k) {
++   a = p[1]
++   h = p[2]
++   ##  cat(a,h,"\n")
++   p = a/(1+a*h*N)
++   -sum(dbinom(k,prob=p,size=N,log=TRUE))
++ }
+> parnames(binomNLL2b) = c("a","h")
+> m2b = mle2(binomNLL2,start=c(a=0.5,h=0.0125),
++   data=list(N=Initial,k=Killed))
+> c2b = confint(m2b)
+There were 50 or more warnings (use warnings() to see the first 50)
+> 
+> N=Initial; k=Killed
+> m2c = mle2(binomNLL2,start=c(a=0.5,h=0.0125))
+> c2c = confint(m2c); c2c
+There were 50 or more warnings (use warnings() to see the first 50)
+        2.5 %     97.5 %
+a 0.402495803 0.68249529
+h 0.006987227 0.02638541
+> 
+> detach(funcresp)
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  4.572   0.048   4.676 

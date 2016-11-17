@@ -1,0 +1,39 @@
+
+R version 2.8.1 (2008-12-22)
+Copyright (C) 2008 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> x <- runif(10)
+> y <- 1+x+rnorm(10,sd=0.1)
+> 
+> library(bbmle)
+> m1 = mle2(y~dnorm(a+b*x,sd=exp(s)),start=list(a=1,b=1,s=log(0.1)))
+> 
+> m2 = mle2(y~dnorm(a+b*x,sd=exp(s)),start=list(a=1,b=1,s=log(0.1)),
++   method="L-BFGS-B",lower=c(a=0,b=0,s=-Inf))
+> 
+> m2F = mle2(y~dnorm(a+b*x,sd=exp(s)),start=list(a=1,b=1,s=log(0.1)),
++   method="L-BFGS-B",lower=c(a=0,b=0,s=-Inf),
++   fixed=list(a=1))
+Warning message:
+In mle2(y ~ dnorm(a + b * x, sd = exp(s)), start = list(a = 1, b = 1,  :
+  length mismatch between lower/upper and number of non-fixed parameters
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  1.008   0.024   1.044 

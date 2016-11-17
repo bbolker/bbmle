@@ -1,0 +1,114 @@
+
+R Under development (unstable) (2012-07-27 r60013) -- "Unsuffered Consequences"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: i686-pc-linux-gnu (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ## I am experiencing difficulties with one of my modeling function (bbmle::mle2)
+> ## which, like other modeling functions in R, uses match.call() to
+> ## retrieve and save the original function call for future use.
+> ## I'll describe the problem for bbmle and then show that I can
+> ## provoke a similar problem with lm().
+> 
+> ## ============
+> ## PART I: mle2()
+> 
+>   library(bbmle)
+> 
+>   x <- 0:10
+>   y <- c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)
+>   d <- data.frame(x,y)
+> 
+> ## The key is to call the modeling function from within another
+> ## function which passes additional arguments via ... 
+> 
+>   ff <- function(d,...) {
++     mle2(y~dpois(lambda=ymean),start=list(ymean=mean(y)),data=d,...)
++   }
+> 
+>   ff(d)
+
+Call:
+mle2(minuslogl = y ~ dpois(lambda = ymean), start = list(ymean = mean(y)), 
+    data = d)
+
+Coefficients:
+   ymean 
+11.54545 
+
+Log-likelihood: -42.73 
+>   try(ff(d,control=list(maxit=1000)))
+
+Call:
+mle2(minuslogl = y ~ dpois(lambda = ymean), start = list(ymean = mean(y)), 
+    data = d, control = ..1)
+
+Coefficients:
+   ymean 
+11.54545 
+
+Log-likelihood: -42.73 
+> 
+> ##   Error in call$control$parscale : 
+> ##      object of type 'symbol' is not subsettable
+> 
+> ## This happens when I try:
+> 
+> ##  call$control$parscale <- eval.parent(call$control$parscale)
+> 
+> ## in 'normal' circumstances call$control and call$control$parscale
+> ## are either NULL or well-specified ...
+> 
+> ## Debugging mle2 shows that the results of match.call() are
+> 
+> ##   mle2(minuslogl = y ~ dpois(lambda = ymean), start = list(ymean = mean(y)), 
+> ##       data = d, control = ..1)
+> 
+> ## ============
+> ## PART II: lm()
+> 
+> ## I can find a similar issue with lm(), although admittedly
+> ## I have to work a bit harder/do something a little bit more
+> ## obscure.
+> 
+>   L1 <-  lm(y~1,data=d,tol=1e-6)
+>   L1$call
+lm(formula = y ~ 1, data = d, tol = 1e-06)
+> 
+>   ff2 <- function(d,...) {
++     lm(y~1,data=d,...)
++   }
+> 
+>   tt <- 1e-6
+>   L2 <- ff2(d,tol=tt)
+>   L2$call
+lm(formula = y ~ 1, data = d, tol = ..1)
+> 
+>   try(update(L2,.~.+x))
+Error in lm.fit(x, y, offset = offset, singular.ok = singular.ok, ...) : 
+  ..1 used in an incorrect context, no ... to look in
+> 
+> ## Error in lm.fit(x, y, offset = offset, singular.ok = singular.ok, ...) : 
+> ##   ..1 used in an incorrect context, no ... to look in
+> 
+>  ## similar issue in curve3d().  How does curve() work?
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.728   1.020   1.595 

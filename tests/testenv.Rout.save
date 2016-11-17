@@ -1,0 +1,68 @@
+
+R Under development (unstable) (2016-10-08 r71471) -- "Unsuffered Consequences"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(bbmle)
+Loading required package: stats4
+> f <- function() {
++   maxit <- 1000
++   d <- data.frame(x=0:10,
++                   y=c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8))
++   mle2(y~dpois(lambda=exp(lymax)/(1+x/exp(lhalf))),
++    start=list(lymax=0,lhalf=0),
++    data=d,
++    control=list(maxit=maxit),
++    parameters=list(lymax~1,lhalf~1))
++ }
+> 
+> f2 <- function(method="BFGS") {
++     d <- data.frame(x=0:10,
++                     y=c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8))
++     mle2(y~dpois(lambda=exp(lymax)/(1+x/exp(lhalf))),
++          start=list(lymax=0,lhalf=0),
++          data=d,
++          method=method,
++          parameters=list(lymax~1,lhalf~1))
++ }
+> 
+> m1 <- f()
+> p <- profile(m1)
+> ## FIXME: check results (need to save in an environment-friendly way!)
+> print(head(as.data.frame(p)),digits=3)
+        param      z par.vals.lymax par.vals.lhalf focal
+lymax.1 lymax -5.469           2.56          27.21  2.56
+lymax.2 lymax -3.204           2.67           2.22  2.67
+lymax.3 lymax -2.569           2.78           1.96  2.78
+lymax.4 lymax -1.931           2.89           1.73  2.89
+lymax.5 lymax -1.292           3.00           1.51  3.00
+lymax.6 lymax -0.648           3.11           1.31  3.11
+> 
+> m2 <- f2()
+> p2 <- profile(m2)
+> print(head(as.data.frame(p2)),digits=3)
+        param      z par.vals.lymax par.vals.lhalf focal
+lymax.1 lymax -5.469           2.56          27.21  2.56
+lymax.2 lymax -3.204           2.67           2.22  2.67
+lymax.3 lymax -2.569           2.78           1.96  2.78
+lymax.4 lymax -1.931           2.89           1.73  2.89
+lymax.5 lymax -1.292           3.00           1.51  3.00
+lymax.6 lymax -0.648           3.11           1.31  3.11
+> 
+> proc.time()
+   user  system elapsed 
+  0.768   0.028   0.832 

@@ -1,0 +1,72 @@
+
+R Under development (unstable) (2013-08-18 r63609) -- "Unsuffered Consequences"
+Copyright (C) 2013 The R Foundation for Statistical Computing
+Platform: i686-pc-linux-gnu (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(bbmle)
+Loading required package: stats4
+> 
+> x <- 0:10
+> y <- c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)
+> d <- data.frame(x,y)
+> oldopts <- options(warn=-1,digits=3)  ## ignore warnings
+> m1 <- mle2(y~dpois(lambda=ymax/(1+x/xhalf)),
++            start=list(ymax=1,xhalf=1),data=d)
+> m1
+
+Call:
+mle2(minuslogl = y ~ dpois(lambda = ymax/(1 + x/xhalf)), start = list(ymax = 1, 
+    xhalf = 1), data = d)
+
+Coefficients:
+ ymax xhalf 
+24.99  3.06 
+
+Log-likelihood: -28.6 
+> y2 <- c(26, 17, 10, 15, 20, 5, 9, 8, 5, 4, 8)
+> d2 <- data.frame(x,y=y2)
+> 
+> m2 <- update(m1,data=d2)
+> m2
+
+Call:
+mle2(minuslogl = y ~ dpois(lambda = ymax/(1 + x/xhalf)), start = list(ymax = 1, 
+    xhalf = 1), data = ..1, lower = -Inf, upper = Inf, control = list())
+
+Coefficients:
+ ymax xhalf 
+24.63  3.16 
+
+Log-likelihood: -29.6 
+> m3 <- update(m1,.~dpois(lambda=c),start=list(c=5))
+> m3
+
+Call:
+mle2(minuslogl = y ~ dpois(lambda = c), start = ..2, data = list(
+    x = 0:10, y = c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)), lower = -Inf, 
+    upper = Inf, control = list())
+
+Coefficients:
+   c 
+11.5 
+
+Log-likelihood: -42.7 
+> options(oldopts)
+> 
+> proc.time()
+   user  system elapsed 
+  0.576   0.832   2.785 

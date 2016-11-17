@@ -1,0 +1,67 @@
+
+R Under development (unstable) (2012-07-27 r60013) -- "Unsuffered Consequences"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: i686-pc-linux-gnu (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(bbmle)
+> 
+> ## Simulate data
+> 
+> set.seed(1)
+> x <- 1:5
+> y <- 2*x+1
+> noise <- rnorm(5, 0, 0.1)
+> mydata <- data.frame(x = x, y=y+noise)
+> 
+> ## Model definition
+> 
+> model <- function(a, b) with(mydata, a*x+b)
+> 
+> ## Negative log-likelihood
+> 
+> nll <- function(par) with(mydata, {
++   a <- par[1]
++   b <- par[2]
++   sum(0.5*((y-model(a,b))/0.1)^2)
++   
++ })
+> 
+> gr <- function(par) with(mydata, {
++   a <- par[1]
++   b <- par[2]
++   dnllda <- -sum(((y-model(a,b))/0.1)*x/0.1)
++   dnlldb <- -sum(((y-model(a,b))/0.1)*1/0.1)
++   return(c(dnllda, dnlldb))
++   
++ })
+> 
+> ## optimization
+> 
+> parnames(nll) <- c("a", "b")
+> parnames(gr) <- c("a", "b")
+> 
+> fit <- mle2(nll, c(a = 1, b=2), gr=gr)
+> 
+> myprof <- profile(fit)
+> 
+> fit <- mle2(nll, c(a = 1, b=2), gr=gr, skip.hessian=TRUE)
+> myprof2 <- profile(fit,std.err=c(0.1,0.1))
+> 
+> proc.time()
+   user  system elapsed 
+  1.028   1.072   1.970 

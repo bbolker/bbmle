@@ -1,0 +1,32 @@
+export(mle2,call.to.char,namedrop,parnames,"parnames<-",relist2)
+export(sbinom,snorm,sbeta,snbinom,spois,sbetabinom)
+export(ICtab,AICtab,BICtab,AICctab)
+export(stdEr,vcov)
+export(slice,sliceOld,slice1D,slice2D)
+exportClasses(mle2)
+exportMethods(AIC, AICc, qAICc, qAIC, 
+               profile, coef, confint, logLik,
+              update, vcov, anova, deviance, residuals,
+              simulate, predict, formula, plot, stdEr, summary)
+importClassesFrom(stats4,mle)
+importFrom(stats4,coef,confint,logLik,BIC,summary,profile,vcov,AIC, update, plot)
+importFrom(stats,
+           anova,deviance,residuals,
+           simulate,predict,formula)
+importFrom(methods,setMethod)
+importFrom(lattice,xyplot,splom,diag.panel.splom,panel.abline,panel.number,panel.points,panel.xyplot)  ## for slice methods
+importFrom(numDeriv,hessian,grad)
+importFrom("grDevices", "dev.interactive")
+importFrom("graphics", "abline", "lines", "par", "points", "text")
+importFrom("methods", "new")
+importFrom("stats", "approx", "approxfun", "as.formula", "constrOptim",
+             "deriv", "model.matrix", "na.omit", "nlm", "nlminb",
+             "optimize", "pchisq", "pnorm", "printCoefmat", "qbeta",
+             "qbinom", "qchisq", "qnbinom", "qnorm", "qpois", "setNames",
+             "spline", "uniroot", "update.formula")
+S3method(as.data.frame,profile.mle2)
+S3method(print,ICtab)
+S3method(slice,mle2)
+S3method(plot,slice)
+S3method(xyplot,slice)
+S3method(splom,slice)

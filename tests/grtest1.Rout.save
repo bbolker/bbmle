@@ -1,0 +1,60 @@
+
+R Under development (unstable) (2016-02-09 r70138) -- "Unsuffered Consequences"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ## from Eric Weese
+> library(bbmle)
+Loading required package: stats4
+> f <- function(x=2,a=1) x^2 - a
+> f.g <- function(x,a) 2*x
+> f.g2 <- function(x,a) c(2*x,0)
+> options(digits=3)
+> mle2(f,fixed=list(a=1))
+
+Call:
+mle2(minuslogl = f, fixed = list(a = 1))
+
+Coefficients:
+       x        a 
+1.09e-13 1.00e+00 
+
+Log-likelihood: 1 
+> mle2(f,gr=f.g,fixed=list(a=1))
+
+Call:
+mle2(minuslogl = f, fixed = list(a = 1), gr = f.g)
+
+Coefficients:
+x a 
+0 1 
+
+Log-likelihood: 1 
+> mle2(f,gr=f.g2,fixed=list(a=1))
+
+Call:
+mle2(minuslogl = f, fixed = list(a = 1), gr = f.g2)
+
+Coefficients:
+x a 
+0 1 
+
+Log-likelihood: 1 
+> 
+> proc.time()
+   user  system elapsed 
+  0.436   0.044   0.488 

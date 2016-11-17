@@ -1,0 +1,130 @@
+
+R Under development (unstable) (2012-12-14 r61321) -- "Unsuffered Consequences"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: i686-pc-linux-gnu (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(bbmle)
+Loading required package: stats4
+> old_opt <- options(digits=3)
+> tracelevel <- 0
+> 
+> ## source("~/lib/R/pkgs/bbmle/pkg/R/mle.R
+> 
+> set.seed(1002)
+> X <- rexp(1000, rate = 0.0001)
+> f <- function(X, rate) {
++   if (tracelevel>0 && rate<0) cat("rate<0: ",rate,"\n")
++   -sum(dexp(X, rate = rate, log = TRUE))
++ }
+> if (FALSE) {
++   ## L-BFGS-B violates bounds, and gets stuck at lower bound
++   m <- mle2(minuslogl = f,
++             data = list(X = X),
++             start = list(rate = 0.01),
++             method = "L-BFGS-B",
++             control = list(trace = tracelevel, 
++                            parscale = 1e-4),
++             lower = c(rate = 1e-9))
++ 
++   profile(m, std.err=0.0001) ## finds new optimum
++ 
++   fsc <- function(X, rate) {
++     -sum(dexp(X, rate = rate*1e-4, log = TRUE))
++   }
++   msc <- mle2(minuslogl = fsc,
++             data = list(X = X),
++             start = list(rate = 100),
++             method = "L-BFGS-B",
++             control = list(trace = tracelevel),
++             lower = c(rate = 1e-5))
++ 
++   ## does it work if we scale by hand?
++   ##   no, identical problem
++ }
+> 
+> ## works fine with a better starting point
+> m <- mle2(minuslogl = f,
++           data = list(X = X),
++           start = list(rate = 0.001),
++           method = "L-BFGS-B",
++           control = list(trace = tracelevel,
++                          parscale=1e-4),
++               lower = c(rate = 1e-9))
+> vcov(m)
+         rate
+rate 1.05e-11
+> confint(m)
+   2.5 %   97.5 % 
+9.61e-05 1.09e-04 
+> 
+> 
+> ## works OK despite warnings about 1-dimensional opt. with N-M
+> (m0 <- mle2(minuslogl = f,
++           data = list(X = X),
++           start = list(rate = 0.01),
++           method = "Nelder-Mead",
++           control = list(trace = tracelevel, parscale = 1e-4)))
+
+Call:
+mle2(minuslogl = f, start = list(rate = 0.01), method = "Nelder-Mead", 
+    data = list(X = X), control = list(trace = tracelevel, parscale = 1e-04))
+
+Coefficients:
+    rate 
+0.000102 
+
+Log-likelihood: -10188 
+Warning message:
+In optim(par = 0.01, fn = function (p)  :
+  one-dimensional optimization by Nelder-Mead is unreliable:
+use "Brent" or optimize() directly
+> vcov(m0)
+         rate
+rate 1.05e-11
+> 
+> confint(m0)
+   2.5 %   97.5 % 
+0.000096 0.000109 
+> confint(m0,method="quad")
+   2.5 %   97.5 % 
+0.000096 0.000109 
+> ## very similar (good quadratic surface, not surprising)
+> 
+> m1 <- mle2(minuslogl = f,
++           data = list(X = X),
++           start = list(rate = 0.01),
++           method = "BFGS",
++           control = list(trace = tracelevel, parscale = 1e-4))
+There were 11 warnings (use warnings() to see them)
+> 
+> 
+> ## gets stuck? will have to investigate ...
+> m2 <- mle2(minuslogl = f,
++            data = list(X = X),
++            start = list(rate = 0.01),
++            optimizer = "optimize",
++            lower=1e-9,upper=0.1)
+> 
+> vcov(m2)
+         rate
+rate 1.41e-11
+> options(old_opt)
+> 
+> proc.time()
+   user  system elapsed 
+  0.732   1.348   1.980 

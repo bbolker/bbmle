@@ -1,0 +1,53 @@
+
+R Under development (unstable) (2012-07-27 r60013) -- "Unsuffered Consequences"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: i686-pc-linux-gnu (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ## set up a data frame for prediction
+> 
+> set.seed(1001)
+> f = factor(rep(letters[1:4],each=20))
+> x = runif(80)
+> u = rnorm(4)
+> y = rnorm(80,mean=2+x*(3+u[f]),sd=0.1)
+> dat = data.frame(f,x,y)
+> 
+> ## fit a model ... could easily do by lm() but want to
+> ##   demonstrate the problem
+> 
+> library(bbmle)
+> m1 = mle2(y~dnorm(a+b*x,sd=exp(logs)),parameters=list(b~f),data=dat,
++   start=list(a=0,b=2,logs=-3))
+> 
+> ## data frame for prediction
+> pp0 = expand.grid(x=seq(0,1,length=11),
++   f=levels(dat$f))
+> 
+> ## combine frame and model data: have to keep the model data
+> ##  around, because it contain other information needed for
+> ##  prediction.
+> 
+> nrow(predict(m1,pp0))
+[1] 44
+> 
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  1.112   1.036   2.007 

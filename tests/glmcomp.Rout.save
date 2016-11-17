@@ -1,0 +1,49 @@
+
+R Under development (unstable) (2014-05-14 r65609) -- "Unsuffered Consequences"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: i686-pc-linux-gnu (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(bbmle)
+Loading required package: stats4
+> library(testthat)
+> x <- 0:10
+> y <- c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)
+> d <- data.frame(x,y)
+> LL <- function(ymax=15, xhalf=6)
++     -sum(stats::dpois(y, lambda=ymax/(1+x/xhalf), log=TRUE))
+> mfit0 <- mle2(y~dpois(lambda=exp(interc)),
++               start=list(interc=log(mean(y))),data=d)
+> 
+> mfit1 <- mle2(y~dpois(lambda=exp(loglambda)),
++               start=list(loglambda=log(mean(y))),data=d)
+>               
+> gfit0 <- glm(y~1,family=poisson)
+> expect_equal(unname(coef(mfit0)),unname(coef(gfit0)))
+> expect_equal(logLik(mfit0),logLik(gfit0))
+> expect_equal(predict(mfit0),  ## only one value for now
++              unique(predict(gfit0,type="response")))
+> 
+> ## FIXME: residuals are backwards
+> expect_equal(residuals(mfit0,type="response"),unname(residuals(gfit0,type="response")))
+> ## FIXME: residuals are backwards
+> expect_equal(residuals(mfit0,type="pearson"),unname(residuals(gfit0,type="pearson")))
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.816   1.912   2.711 

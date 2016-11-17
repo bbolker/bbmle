@@ -1,0 +1,136 @@
+BUGS/ISSUES:
+
+* change the way 'better fit found' is handled in profiles.
+  with try_harder, push through anyway ... otherwise stop
+  WITH AN ERROR and give the user a utility function for how to proceed?
+  *Don't* want to return an object with a different structure --
+  maybe attributes?
+
+* is there a way to (optionally?) save the environment of the
+   call so that fits could be profiled after being removed from
+   their original environments? (maybe fixed?)
+
+* consider "data-absent" flag for big data sets?
+
+* remove "quad" method, replace with confint.default [NO]
+
+* move calcslice from emdbook and make it more robust/general
+  (different signatures: mle2 fits, numeric vectors)
+
+
+* prettier multi-parameter profiles a la Bates/lme4
+* ggplot2 profiles?
+
+* fix confint plot to use linear interpolation when non-monotonic (done)
+* pass parameters through from confint to profile (done?)
+* nobs() methods
+* filter use.ginv properly
+* fix gradient with profile
+
+* work on vignette: ask MM/PD/BDR about mismatch between confint (approx) and profile plot (backspline) ... ?
+
+* DISABLE boundary warning when profiling ...
+* try to do something about rescaling when hessian is problematic?
+* add ginv for problematic hessians? (done)
+* implement 'subset' argument
+* check problems with optimizer="optimize" in tests/parscale.R
+* allow ICtab etc. to recognize optim(), optimize() fits
+  (ASSUMING that the function was a NLL)
+* add optimizer() as alternative optimizer [DONE]
+* fix par mfrow resetting glitch on plotting profile
+* prettier profile plots (with lattice)?  xyplot for profiles?
+* make sure numeric deriv modifications are working
+
+* incorporate optimx (done)?  minpack.lm?
+
+* proper initialization of intercept-less parameter()
+    entries
+
+* plot methods/fortify, a la ggplot2?
+
+* add deviance() method [need S3-to-S4 conversion]
+
+* make sure subset arg is really working!
+
+* spurious error on mismatched parameter names
+
+* spurious warnings in 1-parameter conf int: [FIXED]
+
+   library(bbmle)
+   m1 <- mle2(10~dbinom(prob=p,size=15),start=list(p=0.67))
+   c1 <- confint(m1)
+
+* do one-parameter profiles with optimize??
+
+* use numDeriv library hessian() function instead of nlme::fdHess?
+(or use nlme::fdHess to avoid loading whole package?)
+  [DONE]
+
+* turn off Hessian calculation for profile fits??
+  [maybe DONE by virtue of previous fix]
+
+* should print warning immediately if convergence fails
+
+* some weird stuff with returned fit from found-better-fit profile --
+treating profiled value as fixed ...
+
+* replace approx() in confint() with backspline?
+  general solution for non-monotonic profiles?
+
+BUG:   order of parameters matters for L-BFGS-B
+  (fixed)
+
+  adjusting parameter vectors for lower, upper, parscale, ...
+    when some params are fixed ...
+
+  sort out names BS -- when can we safely remove names?
+
+
+TO DO:
+
+model-averaging?
+
+more documentation -- especially S4 methods!
+   especially:
+     profile
+     plot profile
+     confint
+
+catch/interpret more error messages?
+  (try to filter last.warning?)
+
+add DIC to IC tabs?
+lmer?
+
+WISHLIST:
+start as FUNCTION (i.e., self-start)
+analytic derivatives
+relist
+subset
+plot.predict
+drop1, add1, etc.
+link functions ("identity","log", "logit", etc.)
+delta method standard error calcs
+tranformations on LHS of formula (i.e. use
+  link rather than inverse-link function?  only
+  possible if link is known and invertible:
+
+   inverse 
+   log
+   logit  (qlogis)
+   probit (qnorm)
+
+  etc.
+
+clean up/argue about data handling: closures etc. etc. etc...
+
+document argument handling:
+
+  start must be a named vector or a named list
+       [OR?? inherit from parnames(minuslogl)?]
+  if start is not a list (i.e. a numeric vector)
+  set vecpar TRUE
+  convert start to a list
+
+  if missing and default.start is TRUE use formals(minuslogl) 
+

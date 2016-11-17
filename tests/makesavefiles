@@ -1,0 +1,1 @@
+for i in `echo *.R | sed -e "s/\.R//g"`; do R CMD BATCH --vanilla $i.R; mv $i.Rout $i.Rout.save; done

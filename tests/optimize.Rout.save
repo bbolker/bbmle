@@ -1,0 +1,67 @@
+
+R Under development (unstable) (2012-07-27 r60013) -- "Unsuffered Consequences"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: i686-pc-linux-gnu (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ## try to reconstruct error reported by Hofert Jan Marius
+> ## (simpler version)
+> 
+> Lfun <- function(x) {
++   (x-5)^2
++ }
+> 
+> 
+> 
+> library(bbmle)
+> 
+> lb <- 6
+> ## first try with L-BFGS-B and bounds
+> m1 <- mle2(Lfun,start=list(x=7),lower=6,method="L-BFGS-B")
+Warning message:
+In mle2(Lfun, start = list(x = 7), lower = 6, method = "L-BFGS-B") :
+  some parameters are on the boundary: variance-covariance calculations based on Hessian may be unreliable
+> coef(m1)
+x 
+6 
+> p1 <- profile(m1)
+> plot(p1)
+> (c1 <- confint(m1,quietly=TRUE))
+   2.5 %   97.5 % 
+      NA 6.702747 
+> ## all  OK
+> 
+> m2 <- mle2(Lfun,start=list(x=7),optimizer="optimize",
++            lower=lb,upper=10)
+> coef(m2)
+      x 
+6.00006 
+> p2 <- profile(m2)
+> (c2 <- confint(m2))
+   2.5 %   97.5 % 
+      NA 6.668954 
+> (c2 <- confint(m2))
+   2.5 %   97.5 % 
+      NA 6.668954 
+> plot(p2,show.points=TRUE)
+Warning message:
+In .local(x, ...) :
+  non-monotonic profile: reverting to linear interpolation.  Consider setting std.err manually
+> 
+> proc.time()
+   user  system elapsed 
+  0.960   1.064   1.875 

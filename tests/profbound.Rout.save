@@ -1,0 +1,50 @@
+
+R Under development (unstable) (2013-08-18 r63609) -- "Unsuffered Consequences"
+Copyright (C) 2013 The R Foundation for Statistical Computing
+Platform: i686-pc-linux-gnu (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(bbmle)
+Loading required package: stats4
+> old_opt <- options(digits=3)
+> x <- 0:10
+> y <- c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)
+> d <- data.frame(x,y)
+> 
+> fit0 <- mle2(y~dpois(lambda=ymean),start=list(ymean=mean(y)),data=d,
++              method="L-BFGS-B",lower=10)
+> 
+> stopifnot(is.na(confint(fit0)[1]))
+> 
+> fit1 <- mle2(y~dpois(lambda=exp(a+b*x)),start=list(a=0,b=2),data=d,
++              method="L-BFGS-B",lower=-0.2)
+> 
+> suppressWarnings(confint(fit1))
+  2.5 %  97.5 %
+a  2.81  3.3579
+b    NA -0.0944
+> 
+> fit2 <- mle2(y~dpois(lambda=exp(a+b*x)),start=list(a=0,b=2),data=d,
++              method="L-BFGS-B")
+> 
+> pp <- profile(fit2,prof.lower=-0.2)
+> stopifnot(min(subset(as.data.frame(pp),param=="b")$par.vals.b)==-0.2)
+> ## note that b does go below -0.2 when profiling a ...
+> options(old_opt)
+> 
+> proc.time()
+   user  system elapsed 
+  1.084   0.820   3.943 

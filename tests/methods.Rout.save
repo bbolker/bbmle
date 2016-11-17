@@ -1,0 +1,90 @@
+
+R Under development (unstable) (2014-05-14 r65609) -- "Unsuffered Consequences"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: i686-pc-linux-gnu (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(bbmle)
+Loading required package: stats4
+> x <- 0:10
+> y <- c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)
+> d <- data.frame(x,y)
+> LL <- function(ymax=15, xhalf=6)
++     -sum(stats::dpois(y, lambda=ymax/(1+x/xhalf), log=TRUE))
+> options(digits=3)
+> mfit0 <- mle2(y~dpois(lambda=exp(interc)),
++               start=list(interc=log(mean(y))),data=d)
+> mfit1 <- mle2(y~dpois(lambda=exp(loglambda)),
++               start=list(loglambda=log(mean(y))),data=d)
+> 
+> coef(mfit0)
+interc 
+  2.45 
+> residuals(mfit0)
+ [1]  4.254  1.605  0.428  0.134  2.488 -1.926 -0.749 -1.043 -1.926 -2.221
+[11] -1.043
+> AIC(mfit0)
+[1] 87.5
+> BIC(mfit0)
+[1] 87.9
+> vcov(mfit0)
+        interc
+interc 0.00787
+> ## fitted(mfit0)  ## fails, looks for default value
+> predict(mfit0)  ## FIXME: doesn't expand properly (need implicit lambda~1 formula??)
+[1] 11.5
+> set.seed(1001)
+> simulate(mfit0)
+ [1] 18 10 10 15  7  9 10 14 10 13 15
+> anova(mfit0,mfit1)
+Likelihood Ratio Tests
+Model 1: mfit0, y~dpois(lambda=exp(interc))
+Model 2: mfit1, y~dpois(lambda=exp(loglambda))
+  Tot Df Deviance Chisq Df Pr(>Chisq)
+1      1     85.5                    
+2      1     85.5     0  0          1
+> summary(mfit0)
+Maximum likelihood estimation
+
+Call:
+mle2(minuslogl = y ~ dpois(lambda = exp(interc)), start = list(interc = log(mean(y))), 
+    data = d)
+
+Coefficients:
+       Estimate Std. Error z value  Pr(z)    
+interc   2.4463     0.0887    27.6 <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+-2 log L: 85.5 
+> summary(mfit1)
+Maximum likelihood estimation
+
+Call:
+mle2(minuslogl = y ~ dpois(lambda = exp(loglambda)), start = list(loglambda = log(mean(y))), 
+    data = d)
+
+Coefficients:
+          Estimate Std. Error z value  Pr(z)    
+loglambda   2.4463     0.0887    27.6 <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+-2 log L: 85.5 
+> 
+> proc.time()
+   user  system elapsed 
+  0.672   1.400   2.330 

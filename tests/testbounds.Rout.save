@@ -1,0 +1,46 @@
+
+R Under development (unstable) (2012-12-14 r61321) -- "Unsuffered Consequences"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: i686-pc-linux-gnu (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> x <- runif(10)
+> y <- 1+x+rnorm(10,sd=0.1)
+> d <- data.frame(x,y)
+> 
+> library(bbmle)
+Loading required package: stats4
+> m1 <- mle2(y~dnorm(a+b*x,sd=exp(s)),start=list(a=1,b=1,s=log(0.1)),data=d)
+> 
+> m2 <- mle2(y~dnorm(a+b*x,sd=exp(s)),start=list(a=1,b=1,s=log(0.1)),
++   method="L-BFGS-B",lower=c(a=0,b=0,s=-Inf),data=d)
+> 
+> m2F <- mle2(y~dnorm(a+b*x,sd=exp(s)),start=list(a=1,b=1,s=log(0.1)),
++   method="L-BFGS-B",lower=c(a=0,b=0,s=-Inf),
++   fixed=list(a=1),data=d)
+Warning messages:
+1: In mle2(y ~ dnorm(a + b * x, sd = exp(s)), start = list(a = 1, b = 1,  :
+  length mismatch between lower/upper and number of non-fixed parameters: # lower=3, # upper=0, # non-fixed=2
+2: In oout$par == call$lower :
+  longer object length is not a multiple of shorter object length
+3: In mle2(y ~ dnorm(a + b * x, sd = exp(s)), start = list(a = 1, b = 1,  :
+  some parameters are on the boundary: variance-covariance calculations based on Hessian may be unreliable
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.820   1.052   1.857 

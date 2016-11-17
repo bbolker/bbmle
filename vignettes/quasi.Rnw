@@ -1,0 +1,191 @@
+\documentclass{article}
+%\VignettePackage{mle2}
+%\VignetteIndexEntry{quasi: notes on quasi-likelihood/qAIC analysis inR}
+%\VignetteDepends{MuMIn,AICcmodavg}
+%\VignetteEngine{knitr::knitr}
+
+\usepackage{graphicx}
+\usepackage{url}
+\newcommand{\code}[1]{{\tt #1}}
+\title{Dealing with \code{quasi-}  models in R}
+\date{\today}
+\author{Ben Bolker}
+\begin{document}
+\maketitle
+
+\includegraphics[width=2.64cm,height=0.93cm]{cc-attrib-nc.png}
+\begin{minipage}[b]{3in}
+{\tiny Licensed under the Creative Commons 
+  attribution-noncommercial license
+(\url{http://creativecommons.org/licenses/by-nc/3.0/}).
+Please share \& remix noncommercially,
+mentioning its origin.}
+\end{minipage}
+
+<<opts,echo=FALSE>>=
+if (require("knitr")) opts_chunk$set(tidy=FALSE)
+@ 
+Computing ``quasi-AIC'' (QAIC), in R is a minor
+pain, because  the R Core team (or at least the ones who wrote \code{glm},
+\code{glmmPQL}, etc.) 
+are purists and don't believe that quasi- models should report a likelihood.
+As far as I know, there are three R packages that compute/handle
+QAIC: \code{bbmle}, \code{AICcmodavg} (both on CRAN) and \code{MuMIn}
+(formerly known as \code{dRedging}, on r-forge).
+
+The basic problem is that quasi- model fits with \code{glm} return
+an \code{NA} for the log-likelihood, while the dispersion parameter
+($\hat c$, $\phi$, whatever you want to call it)
+is only reported for quasi- models.
+Various ways to get around this are:
+\begin{itemize}
+  \item{fit the model twice, once with a regular
+      likelihood model (\code{family=binomial}, \code{poisson}, etc.)
+      and once with the \code{quasi-} variant --- extract
+      the log-likelihood from the former and the dispersion parameter
+      from the latter}
+    \item{only fit the regular model; extract
+      the overdispersion parameter manually
+      with
+<<dfun>>=
+dfun <- function(object) {
+  with(object,sum((weights * residuals^2)[weights > 0])/df.residual)
+}
+@ 
+}
+\item{use the fact that quasi- fits still contain a deviance,
+    even if they set the log-likelihood to \code{NA}.  The deviance
+    is twice the negative log-likelihood (it's offset by some constant
+    which I haven't figured out yet, but it should still work
+    fine for model comparisons)}
+\end{itemize}
+
+The whole problem is worse for \code{MASS::glmmPQL}, where (1) the
+authors have gone to greater efforts to make sure that the (quasi-)deviance
+is no longer preserved anywhere in the fitted model, and (2) they
+may have done it for good reason --- it is not clear whether the
+number that would get left in the 'deviance' slot at the end of
+\code{glmmPQL}'s alternating \code{lme} and \code{glm} fits is
+even meaningful to the extent that regular QAICs are.  (For 
+discussion of a similar situation, see the \code{WARNING}
+section of \code{?gamm} in the \code{mgcv} package.)
+
+Example: use the values from one of the examples
+in \code{?glm}:
+
+<<dobdata>>=
+## Dobson (1990) Page 93: Randomized Controlled Trial :
+counts <- c(18,17,15,20,10,20,25,13,12)
+outcome <- gl(3,1,9)
+treatment <- gl(3,3)
+@ 
+
+Fit Poisson and quasi-Poisson models with all combinations
+of predictors:
+
+<<fitdob>>=
+glmOT.D93 <- glm(counts ~ outcome + treatment, family=poisson)
+glmO.D93  <- update(glmOT.D93, . ~ . - treatment)
+glmT.D93  <- update(glmOT.D93, . ~ . - outcome)
+glmX.D93  <- update(glmT.D93, . ~ . - treatment)
+glmQOT.D93 <- update(glmOT.D93, family=quasipoisson)
+glmQO.D93 <- update(glmO.D93, family=quasipoisson)
+glmQT.D93 <- update(glmT.D93, family=quasipoisson)
+glmQX.D93 <- update(glmX.D93, family=quasipoisson)
+@ 
+
+
+Extract log-likelihoods:
+<<dobll>>=
+(sum(dpois(counts,
+          lambda=exp(predict(glmOT.D93)),log=TRUE))) ## by hand
+(logLik(glmOT.D93))  ## from Poisson fit
+@ 
+
+The deviance (\code{deviance(glmOT.D93)}=\Sexpr{round(deviance(glmOT.D93),3)}
+is not the same as $-2L$ (\code{-2*logLik(glmOT.D93)}=\Sexpr{round(-2*c(logLik(glmOT.D93)),3)}),
+but the calculated differences in deviance are consistent,
+and are also extractable from the quasi- fit even though
+the log-likelihood is \code{NA}:
+<<dobll2>>=
+(-2*(logLik(glmT.D93)-logLik(glmOT.D93)))  ## Poisson fit
+(deviance(glmT.D93)-deviance(glmOT.D93))   ## Poisson fit
+(deviance(glmQT.D93)-deviance(glmQOT.D93)) ## quasi-fit
+@ 
+
+
+Compare hand-computed dispersion (in two ways)
+with the dispersion computed by \code{summary.glm()}
+on a quasi- fit:
+
+<<dobdisp>>=
+(dfun(glmOT.D93))
+(sum(residuals(glmOT.D93,"pearson")^2)/glmOT.D93$df.residual)
+(summary(glmOT.D93)$dispersion)
+(summary(glmQOT.D93)$dispersion)
+@ 
+
+
+\section*{Examples}
+
+\subsection*{\code{bbmle} package (Ben Bolker), CRAN/R-forge}
+
+<<bbmle>>=
+library(bbmle)
+(qAIC(glmOT.D93,dispersion=dfun(glmOT.D93)))
+(qAICc(glmOT.D93,dispersion=dfun(glmOT.D93),nobs=length(counts)))
+ICtab(glmOT.D93,glmT.D93,glmO.D93,glmX.D93,
+      dispersion=dfun(glmOT.D93),type="qAIC")
+ICtab(glmOT.D93,glmT.D93,glmO.D93,glmX.D93,
+      dispersion=dfun(glmOT.D93),
+      nobs=length(counts),type="qAICc")
+detach("package:bbmle")
+@ 
+
+\subsection*{\code{AICcmodavg} package (Marc Mazerolle), CRAN}
+
+<<AICcmodavg>>=
+library(AICcmodavg)
+aictab(list(glmOT.D93,glmT.D93,glmO.D93,glmX.D93), 
+       modnames=c("OT","T","O","X"),
+       c.hat=dfun(glmOT.D93))
+detach("package:AICcmodavg")
+@ 
+
+\subsection*{\code{MuMIn} package (Kamil Barto{\'n})}
+
+<<MuMin>>=
+library(MuMIn); packageVersion("MuMIn")
+## from ?QAIC
+x.quasipoisson <- function(...) {
+    res <- quasipoisson(...)
+    res$aic <- poisson(...)$aic
+    res
+}
+glmQOT2.D93 <- update(glmOT.D93,family="x.quasipoisson",
+                      na.action=na.fail)
+(gg <-  dredge(glmQOT2.D93,rank="QAIC", chat=dfun(glmOT.D93)))
+(ggc <- dredge(glmQOT2.D93,rank="QAICc",chat=dfun(glmOT.D93)))
+detach("package:MuMIn")
+@ 
+
+Notes: ICtab only gives delta-IC, limited decimal places
+(on purpose, but how do you change these defaults if you
+want to?).  Need to add 1 to parameters
+to account for scale parameter.  When doing corrected-IC you need
+to get the absolute number of parameters right, not just the relative
+number \ldots Not sure which classes of models each of these
+will handle (lm, glm, (n)lme, lme4, mle2 \ldots).  Remember
+need to use overdispersion parameter from most complex model.
+glmmPQL: needs to be hacked somewhat more severely (does not
+contain deviance element, logLik has been NA'd out).
+
+\begin{tabular}{l|ccccccc}
+  package & \code{lm} & \code{glm} & \code{(n)lme} & \code{multinom} & \code{polr} & \code{lme4} & \code{mle2} \\
+  \hline
+  \code{AICcmodavg} & y & y & y & y & y & ? & ? \\
+  \code{MuMIn}      & ? & ? & ? & ? & ? & ? & ? \\
+  \code{mle2 }      & ? & ? & ? & ? & ? & ? & ?
+\end{tabular}
+  
+\end{document}

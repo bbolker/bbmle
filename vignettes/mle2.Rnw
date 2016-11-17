@@ -1,0 +1,813 @@
+\documentclass{article}
+%\VignetteIndexEntry{Examples for enhanced mle code}
+%\VignettePackage{bbmle}
+%\VignetteDepends{Hmisc}
+%\VignetteDepends{emdbook}
+%\VignetteDepends{ggplot2}
+%\VignetteDepends{lattice}
+%\VignetteEngine{knitr::knitr}
+\usepackage[utf8]{inputenc} % for UTF-8/single quotes from sQuote()
+\usepackage[english]{babel} % for texi2dvi ~ bug
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{array}
+\usepackage{color}
+\usepackage[colorlinks=true,urlcolor=blue,bookmarks=true]{hyperref}
+\usepackage{url}
+\author{Ben Bolker}
+\title{Maximum likelihood estimation and analysis
+  with the \code{bbmle} package}
+\newcommand{\code}[1]{{\tt #1}}
+\newcommand{\bbnote}[1]{\color{red} {\em #1} \color{black}}
+\date{\today}
+\begin{document}
+\bibliographystyle{chicago}
+%\bibliographystyle{plain}
+\maketitle
+\tableofcontents
+
+<<knitropts,echo=FALSE,message=FALSE>>=
+if (require("knitr")) opts_chunk$set(fig.width=5,fig.height=5,tidy=FALSE,warning=FALSE,error=TRUE)
+@ 
+<<setup,results="hide",echo=FALSE,message=FALSE>>=
+library(Hmisc)
+@ 
+
+The \code{bbmle} package, designed to simplify
+maximum likelihood estimation and analysis in R,
+extends and modifies the \code{mle} function and class
+in the \code{stats4} package that comes with R by default.
+\code{mle} is in turn a wrapper around the \code{optim}
+function in base R.
+The maximum-likelihood-estimation function and class
+in \code{bbmle} are both called \code{mle2}, to avoid
+confusion and conflict with the original functions in
+the \code{stats4} package.  The major differences between
+\code{mle} and \code{mle2} are:
+\begin{itemize}
+\item \code{mle2} is more robust, with additional warnings (e.g.
+  if the Hessian can't be computed by finite differences,
+  \code{mle2} returns a fit with a missing Hessian rather
+  than stopping with an error)
+\item \code{mle2} uses a \code{data} argument to allow different
+  data to be passed to the negative log-likelihood function
+\item \code{mle2} has a formula interface like that
+ of (e.g.) \code{gls} in the \code{nlme} package.
+ For relatively simple models the formula for the
+ maximum likelihood can be written in-line, rather than
+ defining a negative log-likelihood function.  The formula
+ interface also simplifies fitting models with
+ categorical variables.  Models fitted using the formula interface
+ also have applicable \code{predict} and \code{simulate} methods.
+\item \code{bbmle} defines \code{anova}, \code{AIC}, \code{AICc}, 
+  and \code{BIC} methods for
+  \code{mle2} objects, as well as
+  \code{AICtab}, \code{BICtab}, \code{AICctab}
+  functions for producing summary tables of information criteria for a 
+  set of models.
+\end{itemize}
+
+Other packages with similar functionality (extending
+GLMs in various ways) are
+\begin{itemize}
+\item on CRAN: \code{aods3} (overdispersed models such as beta-binomial);
+  \code{vgam} (a wide range of models);
+  \code{betareg} (beta regression);
+  \code{pscl} (zero-inflated, hurdle models);
+  \code{maxLik} (another general-purpose maximizer, with
+  a different selection of optimizers)
+\item In Jim Lindsey's code repository
+  (\url{http://popgen.unimaas.nl/~jlindsey/rcode.html}):
+  \code{gnlr} and \code{gnlr3}
+\end{itemize}
+  
+\section{Example: \emph{Orobanche}/overdispersed binomial}
+
+This example will use the classic data set on
+\emph{Orobanche} germination from \cite{Crowder1978}
+(you can also use
+\code{glm(...,family="quasibinomial")} or
+the \code{aods3} package to analyze these data).
+
+\subsection{Test basic fit to simulated beta-binomial data}
+
+First, generate a single beta-binomially distributed
+set of points as a simple test.
+
+Load the \code{emdbook} package
+to get functions for the beta-binomial distribution (random-deviate 
+function \code{rbetabinom} --- these functions are also available
+in Jim Lindsey's \code{rmutil} package).
+<<emdbook,message=FALSE>>=
+library(emdbook)
+@  
+
+Generate random deviates from a random beta-binomial:
+<<bbsim>>=
+set.seed(1001)
+x1 <- rbetabinom(n=1000,prob=0.1,size=50,theta=10)
+@ 
+
+Load the package:
+<<bbmle,message=FALSE>>=
+library("bbmle")
+@ 
+
+Construct a simple negative log-likelihood function:
+<<likfun1>>=
+mtmp <- function(prob,size,theta) {
+  -sum(dbetabinom(x1,prob,size,theta,log=TRUE))
+}
+@ 
+
+Fit the model --- use \code{data} to pass the \code{size}
+parameter (since it wasn't hard-coded in the \code{mtmp}
+function):
+<<fit1,warning=FALSE>>=
+(m0 <- mle2(mtmp,start=list(prob=0.2,theta=9),data=list(size=50)))
+@
+(here and below, I'm suppressing lots of warnings about {\tt NaNs produced})
+
+The \code{summary} method for \code{mle2} objects
+shows the parameters; approximate standard
+errors (based on quadratic approximation to the curvature at
+the maximum likelihood estimate); and a test
+of the parameter difference from zero based on
+this standard error and on an assumption 
+that the likelihood surface is quadratic
+(or equivalently that the sampling distribution
+of the estimated parameters is normal).
+
+<<sum1>>=
+summary(m0)
+@ 
+
+Construct the likelihood profile (you can
+apply \code{confint} directly to \code{m0},
+but if you're going to work with the likelihood
+profile [e.g. plotting, or looking for confidence
+intervals at several different $\alpha$ values]
+then it is more efficient to compute the profile
+once):
+
+<<prof1,cache=TRUE,warning=FALSE>>=
+p0 <- profile(m0)
+@ 
+
+Compare the confidence interval estimates based on
+inverting a spline fit to the profile (the default);
+based on the quadratic approximation at the
+maximum likelihood estimate; and based on
+root-finding to find the exact point where the
+profile crosses the critical level.
+
+<<confint1,warning=FALSE>>=
+confint(p0)
+confint(m0,method="quad")
+confint(m0,method="uniroot")
+@ 
+
+All three types of confidence limits are similar.
+
+Plot the profiles:
+<<profplot1,fig.height=5,fig.width=10,out.width="\\textwidth">>=
+par(mfrow=c(1,2))
+plot(p0,plot.confstr=TRUE)
+@ 
+
+By default, the plot method for 
+likelihood profiles displays the square root of the
+the deviance difference
+(twice the difference in negative
+log-likelihood from the best fit), so it will
+be {\sf V}-shaped
+for cases where the quadratic approximation works well
+(as in this case).
+(For a better visual estimate of whether the profile
+is quadratic, use the \code{absVal=FALSE} option to the \code{plot}
+method.)
+
+You can also request confidence intervals
+calculated using \code{uniroot}, which may be more exact when
+the profile is not smooth enough to be modeled accurately
+by a spline.  However, this method is
+also more sensitive to numeric problems.
+
+Instead of defining an
+explicit function for \code{minuslogl}, 
+we can also use the formula interface.
+The formula interface assumes that
+the density function given (1) has \code{x} as
+its first argument (if the distribution is multivariate,
+then \code{x} should be a matrix of observations) and
+(2) has a \code{log} argument that will return
+the log-probability or log-probability density
+if \code{log=TRUE}.  Some of the extended functionality
+(prediction etc.) depends on the existence of 
+an \code{s}- variant function for the distribution
+that returns (at least) the mean and median as
+a function of the parameters
+(currently defined: \code{snorm}, \code{sbinom},
+\code{sbeta}, \code{snbinom}, \code{spois}).
+<<fit2,warning=FALSE>>=
+m0f <- mle2(x1~dbetabinom(prob,size=50,theta),
+            start=list(prob=0.2,theta=9),data=data.frame(x1))
+@ 
+Note that you must specify the data via the \code{data}
+argument when using the formula interface. This may be
+slightly more unwieldy than just pulling the data from your
+workspace when you are doing simple things, but in the long
+run it makes tasks like predicting new responses much simpler.
+
+It's convenient to use the formula interface
+to try out likelihood estimation on the
+transformed parameters:
+<<fit2f>>=
+m0cf <- mle2(x1~dbetabinom(prob=plogis(lprob),size=50,theta=exp(ltheta)),
+            start=list(lprob=0,ltheta=2),data=data.frame(x1))
+confint(m0cf,method="uniroot")
+confint(m0cf,method="spline")
+@ 
+
+In this case the answers from \code{uniroot}
+and \code{spline} (default) methods barely
+differ.
+
+\subsection{Real data (\emph{Orobanche}, \cite{Crowder1978})}
+Data are copied from the \code{aods3} package
+(but a copy is saved with the package to avoid depending on the
+ \code{aods3} package):
+<<orobdata>>=
+load(system.file("vignetteData","orob1.rda",package="bbmle"))
+summary(orob1)
+@ 
+
+Now construct a negative log-likelihood
+function that differentiates among groups:
+<<aodlikfun>>=
+ML1 <- function(prob1,prob2,prob3,theta,x) {
+  prob <- c(prob1,prob2,prob3)[as.numeric(x$dilution)]
+  size <- x$n
+  -sum(dbetabinom(x$m,prob,size,theta,log=TRUE))
+}
+@ 
+
+Results from \cite{Crowder1978}:
+<<crowdertab,echo=FALSE,results="asis">>=
+crowder.results <- matrix(c(0.132,0.871,0.839,78.424,0.027,0.028,0.032,-34.991,
+                            rep(NA,7),-34.829,
+                            rep(NA,7),-56.258),
+                          dimnames=list(c("prop diffs","full model","homog model"),
+                            c("prob1","prob2","prob3","theta","sd.prob1","sd.prob2","sd.prob3","NLL")),
+                          byrow=TRUE,nrow=3)
+latex(crowder.results,file="",table.env=FALSE,title="model")
+@
+
+<<aodfit1,cache=TRUE,warning=FALSE>>=
+(m1 <- mle2(ML1,start=list(prob1=0.5,prob2=0.5,prob3=0.5,theta=1),
+            data=list(x=orob1)))
+@ 
+
+Or:
+<<eval=FALSE>>=
+## would prefer ~dilution-1, but problems with starting values ...
+(m1B <- mle2(m~dbetabinom(prob,size=n,theta),
+             param=list(prob~dilution),
+             start=list(prob=0.5,theta=1),
+    data=orob1))
+@ 
+The result warns us that the optimization has not
+converged; we also don't match
+Crowder's results for $\theta$ exactly.
+We can fix both of these problems by setting \code{parscale} appropriately.
+
+Since we don't bound $\theta$ (or below, $\sigma$) we get  a fair number
+of warnings with this and the next few fitting and profiling attempts.
+We will ignore these for now, since the final results reached are reasonable
+(and match or nearly match Crowder's values); the appropriate, careful thing
+to do would be either to fit on a transformed scale where all real-valued
+parameter values were legal, or to use \code{method="L-BFGS-B"} (or \code{method="bobyqa"} 
+with the \code{optimx} package) to bound the parameters appropriately.
+You can also use \code{suppressWarnings()} if you're sure you don't
+need to know about any warnings (beware: this will suppress \emph{all}
+warnings, those you weren't expecting as well as those you were \ldots)
+
+<<suppWarn,echo=FALSE>>=
+opts_chunk$set(warning=FALSE)
+@ 
+<<aodfit2,cache=TRUE>>=
+(m2 <- mle2(ML1,start=as.list(coef(m1)),
+          control=list(parscale=coef(m1)),
+          data=list(x=orob1)))
+@ 
+
+Calculate likelihood profile (restrict the upper limit
+of $\theta$, simply because it will make the picture
+below a little bit nicer):
+<<aodprof2,cache=TRUE>>=
+p2 <- profile(m2,prof.upper=c(Inf,Inf,Inf,theta=2000))
+@ 
+
+Get the curvature-based parameter standard
+deviations (which Crowder used
+rather than computing likelihood profiles):
+<<aodstderr>>=
+round(stdEr(m2),3)
+@ 
+We are slightly off Crowder's numbers --- rounding
+error?
+
+Crowder also defines a variance (overdispersion) parameter
+$\sigma^2=1/(1+\theta)$.
+<<aodvar>>=
+sqrt(1/(1+coef(m2)["theta"]))
+@ 
+
+Using the delta method (via the \code{deltavar}
+function in the \code{emdbook} package)
+to approximate the standard deviation of
+$\sigma$:
+<<deltavar>>=
+sqrt(deltavar(sqrt(1/(1+theta)),meanval=coef(m2)["theta"],
+         vars="theta",Sigma=vcov(m2)[4,4]))
+@ 
+
+Another way to fit in terms of $\sigma$ rather than $\theta$
+is to compute $\theta=1/\sigma^2-1$ on the fly in a
+formula:
+
+<<sigma3>>=
+m2b <- mle2(m~dbetabinom(prob,size=n,theta=1/sigma^2-1),
+            data=orob1,
+            parameters=list(prob~dilution,sigma~1),
+            start=list(prob=0.5,sigma=0.1))
+## ignore warnings (we haven't bothered to bound sigma<1)
+round(stdEr(m2b)["sigma"],3)
+p2b <- profile(m2b,prof.lower=c(-Inf,-Inf,-Inf,0))
+@ 
+
+As might be expected since the standard deviation
+of $\sigma$ is large, the quadratic approximation is
+poor:
+
+<<compquad>>=
+r1 <- rbind(confint(p2)["theta",],
+            confint(m2,method="quad")["theta",])
+rownames(r1) <- c("spline","quad")
+r1
+@ 
+
+Plot the profile:
+<<profplottheta>>=
+plot(p2,which="theta",plot.confstr=TRUE)
+@ 
+
+What does the profile for $\sigma$ look like?
+<<profplotsigma>>=
+plot(p2b,which="sigma",plot.confstr=TRUE,
+     show.points=TRUE)
+@ 
+
+Now fit a homogeneous model:
+<<homogmodel>>=
+ml0 <- function(prob,theta,x) {
+  size <- x$n
+  -sum(dbetabinom(x$m,prob,size,theta,log=TRUE))
+}
+m0 <- mle2(ml0,start=list(prob=0.5,theta=100),
+          data=list(x=orob1))
+@ 
+
+The log-likelihood matches Crowder's result:
+<<logLikcomp>>=
+logLik(m0)
+@ 
+
+It's easier to 
+use the formula interface
+to specify all three of the models
+fitted by Crowder (homogeneous, probabilities differing
+by group, probabilities and overdispersion differing
+by group):
+
+<<formulafit>>=
+m0f <- mle2(m~dbetabinom(prob,size=n,theta),
+            parameters=list(prob~1,theta~1),
+            data=orob1,
+            start=list(prob=0.5,theta=100))
+m2f <- update(m0f,
+              parameters=list(prob~dilution,theta~1),
+              start=list(prob=0.5,theta=78.424))
+m3f <- update(m0f,
+              parameters=list(prob~dilution,theta~dilution),
+              start=list(prob=0.5,theta=78.424))
+@ 
+
+\code{anova} runs a likelihood ratio test on nested
+models:
+<<anovafit>>=
+anova(m0f,m2f,m3f)
+@ 
+
+The various \code{ICtab} commands produce tables of
+information criteria, optionally sorted and
+with model weights.
+<<ICtabfit>>=
+AICtab(m0f,m2f,m3f,weights=TRUE,delta=TRUE,sort=TRUE)
+BICtab(m0f,m2f,m3f,delta=TRUE,nobs=nrow(orob1),sort=TRUE,weights=TRUE)
+AICctab(m0f,m2f,m3f,delta=TRUE,nobs=nrow(orob1),sort=TRUE,weights=TRUE)
+@ 
+<<reWarn,echo=FALSE>>=
+opts_chunk$set(warning=FALSE)
+@ 
+
+\section{Example: reed frog size predation}
+
+Data from an experiment by Vonesh \citep{VoneshBolker2005}
+<<frogsetup>>=
+frogdat <- data.frame(
+  size=rep(c(9,12,21,25,37),each=3),
+  killed=c(0,2,1,3,4,5,rep(0,4),1,rep(0,4)))
+frogdat$initial <- rep(10,nrow(frogdat))
+@ 
+
+<<getgg>>=
+library(ggplot2)
+@ 
+
+<<gg1>>=
+gg1 <- ggplot(frogdat,aes(x=size,y=killed))+geom_point()+
+      stat_sum(aes(size=factor(..n..)))+
+      labs(size="#")+scale_x_continuous(limits=c(0,40))
+@ 
+
+<<frogfit1,cache=TRUE,warning=FALSE>>=
+m3 <- mle2(killed~dbinom(prob=c*(size/d)^g*exp(1-size/d),
+  size=initial),data=frogdat,start=list(c=0.5,d=5,g=1))
+pdat <- data.frame(size=1:40,initial=rep(10,40))
+pdat1 <- data.frame(pdat,killed=predict(m3,newdata=pdat))
+@
+
+<<frogfit2,cache=TRUE,warning=FALSE>>=
+m4 <- mle2(killed~dbinom(prob=c*((size/d)*exp(1-size/d))^g,
+  size=initial),data=frogdat,start=list(c=0.5,d=5,g=1))
+pdat2 <- data.frame(pdat,killed=predict(m4,newdata=pdat))
+@ 
+
+<<gg1plot>>=
+gg1 + geom_line(data=pdat1,colour="red")+
+      geom_line(data=pdat2,colour="blue")
+@ 
+
+<<frogfit2anal,cache=TRUE,warning=FALSE>>=
+coef(m4)
+prof4 <- profile(m4)
+@ 
+
+Three different ways to draw the profile:
+
+(1) Built-in method (base graphics):
+<<basegraphprofplot>>=
+plot(prof4)
+@ 
+
+(2) Using \code{xyplot} from the \code{lattice} package:
+\setkeys{Gin}{width=\textwidth}
+<<latticeprof,fig.height=5,fig.width=10,out.width="\\textwidth">>=
+prof4_df <- as.data.frame(prof4)
+library(lattice)
+xyplot(abs(z)~focal|param,data=prof4_df,
+      subset=abs(z)<3,
+       type="b",
+       xlab="",
+       ylab=expression(paste(abs(z),
+           " (square root of ",Delta," deviance)")),
+       scale=list(x=list(relation="free")),
+             layout=c(3,1))
+@ 
+
+(3) Using \code{ggplot} from the \code{ggplot2} package:
+<<ggplotprof,fig.height=5,fig.width=10>>=
+ss <-subset(prof4_df,abs(z)<3)
+ggplot(ss,
+       aes(x=focal,y=abs(z)))+geom_line()+
+      geom_point()+
+      facet_grid(.~param,scale="free_x")
+@ 
+
+\section*{Additions/enhancements/differences from \code{stats4::mle}}
+\begin{itemize}
+\item{\code{anova} method}
+\item{warnings on convergence failure}
+\item{more robust to non-positive-definite Hessian;
+  can also specify \code{skip.hessian} to skip Hessian
+  computation when it is problematic}
+\item{when profiling fails because better value is
+    found, report new values}
+\item{can take named vectors as well as lists as
+    starting parameter vectors}
+\item{added \code{AICc}, \code{BIC} definitions,
+    \code{ICtab} functions}
+\item{added \code{"uniroot"} and \code{"quad"}
+    options to \code{confint}}
+\item{more options for colors and line types etc etc.
+The old arguments are:
+<<oldargs,eval=FALSE>>=
+function (x, levels, conf = c(99, 95, 90, 80, 50)/100, nseg = 50,
+          absVal = TRUE, ...) {}
+@ 
+The new one is:
+<<newargs,eval=FALSE>>=
+function (x, levels, which=1:p, conf = c(99, 95, 90, 80, 50)/100, nseg = 50,
+          plot.confstr = FALSE, confstr = NULL, absVal = TRUE, add = FALSE,
+          col.minval="green", lty.minval=2,
+          col.conf="magenta", lty.conf=2,
+          col.prof="blue", lty.prof=1,
+          xlabs=nm, ylab="score",
+          show.points=FALSE,
+          main, xlim, ylim, ...) {}
+@ 
+\code{which} selects (by character vector or numbers)
+which parameters to plot: \code{nseg} does nothing
+(even in the old version); \code{plot.confstr} turns on
+the labels for the confidence levels; \code{confstr} gives
+the labels; \code{add} specifies whether to add the
+profile to an existing plot; \code{col} and \code{lty}
+options specify the colors and line types for
+horizontal and vertical lines marking the minimum
+and confidence vals and the profile curve; \code{xlabs}
+gives a vector of x labels; \code{ylab} gives the y label;
+\code{show.points} specifies whether to show the raw points
+computed.
+}
+\item{\code{mle.options()}}
+\item{\code{data} argument}
+\item{handling of names in argument lists}
+\item{can use alternative optimizers (\code{nlminb}, \code{nlm}, \code{constrOptim}, \code{optimx},
+    \code{optimize})}
+\item{uses code from \code{numDeriv} package to compute Hessians rather than
+    built-in optimizer code}
+\item{by default, uses \code{MASS::ginv} (generalized inverse) rather than \code{solve} to invert
+    Hessian (more robust to positive-semidefinite Hessians \ldots)}
+\item{can use \code{vecpar=TRUE} (and \code{parnames()}) to use objective functions with parameters
+    specified as vectors (for compatibility with \code{optim} etc.)}
+\end{itemize}
+
+\section{Newer stuff}
+
+\textbf{To do:}
+\begin{itemize}
+\item{use \code{predict}, \code{simulate} etc.
+    to demonstrate different parametric bootstrap approaches
+    to confidence and prediction intervals
+    \begin{itemize}
+    \item use \code{predict} to get means and standard
+      deviations, use delta method?
+    \item use \code{vcov}, assuming quadratic profiles,
+      with \code{predict(\ldots,newparams=\ldots)}
+    \item prediction intervals assuming no parameter uncertainty
+      with \code{simulate}
+    \item both together \ldots
+    \end{itemize}
+  }
+\end{itemize}
+
+
+\section{Technical details}
+
+\subsection{Profiling and confidence intervals}
+
+This section describes the algorithm for constructing profiles
+and confidence intervals, which is not otherwise documented anywhere
+except in the code.  * indicates changes from the version
+in \code{stats4:::mle}
+
+\subsubsection{Estimating standard error}
+
+In order to construct the profile for a particular parameter, one
+needs an initial estimate of the scale over which to vary that
+parameter.  The estimated standard error of the parameter based
+on the estimated curvature of the likelihood surface at the MLE
+is a good guess.
+\begin{itemize}
+\item if \code{std.err} is missing, extract the 
+  standard error from the summary coefficient table (ultimately computed from 
+  \code{sqrt(diag(inverse Hessian))} of the fit)
+\item * a user-set value of \code{std.err} overrides this behavior 
+  unless the value is specified as \code{NA} (in which
+  case the estimate from the previous step is used)
+\item * if the standard error value is still \code{NA} (i.e. the
+  user did not specify it and the value estimated from the Hessian
+  is missing or \code{NA}) use \code{sqrt(1/diag(hessian))}. This
+  represents a (fairly feeble) attempt to come up with a plausible number
+  when the Hessian is not positive definite but still has positive diagonal
+  entries
+\item if all else fails, stop and * print an error message that encourages
+  the user to specify the values with \code{std.err}
+\end{itemize}
+  
+There may be further tricks that would help guess the appropriate scale:
+for example, one could guess on the basis of a comparison between the
+parameter values and negative log-likelihoods at the starting and ending points
+of the fits.  On the other hand, (a) this would take some effort and
+still be subject to failure for sufficiently pathological fits and (b) there
+is some value to forcing the user to take explicit, manual steps to remedy
+such problems, as they may be signs of poorly defined or buggy log-likelihood
+functions.
+
+\subsubsection{Profiling}
+  
+Profiling is done on the basis of a constructed function that minimizes
+the negative log-likelihood for a fixed value of the focal parameter and
+returns the signed square-root of the deviance difference from the 
+minimum (denoted by $z$).  At the MLE $z=0$ by definition; it should never
+be $<0$ unless something has gone wrong with the original fit. The LRT significance
+cutoffs for $z$ are equal to the usual two-tailed normal distribution cutoffs
+(e.g. $\pm \approx 1.96$ for 95\% confidence regions).
+  
+In each direction (decreasing and increasing from the MLE for the focal parameter):
+\begin{itemize}
+\item fix the focal parameter
+\item adjust control parameters etc. accordingly (e.g. remove the
+  entry for the focal parameter so that the remaining control
+  parameters match the non-fixed parameters)
+\item{controls on the profiling (which can be set manually, but for which there
+    is not much guidance in the documentation):
+    \begin{itemize}
+    \item \code{zmax} Maximum $z$ to aim for. (Default: \code{sqrt(qchisq(1-alpha/2, p))})
+      The default maximum $\alpha$ (type~I error) is 0.01.
+      \bbnote{I don't understand this
+        criterion. It seems to expand the size of the univariate profile
+        to match a cutoff for the multivariate confidence region of
+        the model.  The $\chi^2$ cutoff for deviance to get the $(1-\alpha)$ 
+        multivariate confidence region (i.e.,
+        on all $p$ of the parameters) would be \code{qchisq(1-alpha,p)} --- %
+        representing a one-tailed test on the deviance.  Taking the square root
+        makes sense, since we are working with the square root of the deviance,
+        but I don't understand (1) why we are expanding the region to allow
+        for the multivariate confidence region (since we are computing univariate
+        profiles) [you could at least argue that this is conservative, making
+        the region a little bigger than it needs to be]; (2) why we are
+        using $1-\alpha/2$ rather than $1-\alpha$.
+      }
+      For comparison, \code{MASS::profile.glm} (written by Bates and Venables in
+      1996, ported to R by BDR in 1998) uses \code{zmax}=\code{sqrt(qchisq(1-alpha,1))}
+      \bbnote{(this makes more sense to me \ldots)}.
+      On the other hand, the profiling code in \code{lme4a} (the \code{profile}
+      method for \code{merMod}, in \code{profile.R}) uses
+      \code{qchisq(1-alphamax, nptot)} \ldots
+    \item \code{del} Step size (scaled by standard error) (Default: \code{zmax}/5.)
+      Presumably (?) copied from \code{MASS::profile.glm}, 
+      which says (in \code{?profile.glm}):
+      ``[d]efault value chosen to allow profiling at about 10 parameter
+      values.''
+    \item \code{maxsteps} Maximum number of profiling steps to try in each direction. (Default: 100)
+    \end{itemize}
+  }
+\item While \verb+step<maxsteps+ and \verb+abs(z) < zmax+, set the value of the focal
+  parameter to its MLE + \code{sgn*step*del*std.err} where \code{sgn} represents
+  the direction, \code{step} is the current (integer) step, and \code{del} and 
+  \code{std.err} are the step size scaling factor and standard error estimate
+  discussed above (i.e. take steps of size (\code{del*std.err}) in the appropriate direction);
+  evaluate $z$
+\item{Stop the profiling: 
+    \begin{itemize}
+    \item if $z$ doesn't change from the previous step (\verb+stop_flat+) %
+      --- unless \verb+try_harder+ is \code{TRUE}
+    \item * stop if $z$ is less than \code{tol.newmin} (default: 0.001) units 
+      \emph{better} than the MLE fit, i.e. $z<-\mbox{\code{tol.newmin}}$
+      (if $-\mbox{\code{tol.newmin}}<z<0$, set $z$ to zero) (\verb+newpars_found+)
+    \item if $z$ is \code{NA} (\verb+stop_na+)  --- unless \verb+try_harder+ is \code{TRUE}
+    \item if $z$ is beyond \code{zmax} (i.e., we have reached our goal: \verb+stop_cutoff+)
+    \item if \code{step==maxsteps}
+    \item if the focal parameter has hit its upper/lower bound (\verb+stop_bound+)
+    \end{itemize}
+  }
+\item if we have hit the maximum number of steps but not reached the cutoff
+  (\verb+stop_maxstep+ but not \verb+stop_cutoff+), ``try a bit harder'':
+  go \emph{almost} one more \code{del*std.err} unit out (in intervals
+  of 0.2, 0.4, 0.6, 0.8, 0.9) (\bbnote{also seems reasonable but don't
+    know where it comes from})
+\item * if we violated the boundary but did not reach the cutoff
+  (\verb+!stop_cutoff && stop_bound+), evaluate $z$ at the boundary
+\item if we got to the cutoff in $<5$ steps, try smaller steps:
+  start at \code{step=0.5} and proceed to
+  \code{mxstep-0.5} in unit increments
+  (rather than the original scale which went from 0 to \code{mxstep}).
+  (\bbnote{
+    Again, it seems reasonable, but I don't know what the original justification
+    was \ldots})
+\end{itemize}
+
+\subsubsection{Confidence intervals}
+
+We are looking for the values where $z$ (signed square root deviance
+difference) is equal to the usual two-tailed normal distribution cutoffs
+for a specified $\alpha$ level, e.g. $z=\pm 1.96$ for 95\% confidence
+intervals (this is equivalent to a one-tailed test on the deviance
+difference with the cutoff value for $\chi^2_1$).
+
+\begin{description}
+\item[Spline method]{(default)
+    \begin{itemize}
+    \item If necessary (i.e. if applied to a fitted object and not 
+      to an existing profile), construct the profile
+    \item * If the profile of the signed square root is non-monotonic,
+      warn the user and revert to linear approximation on the profiled points
+      to find the cutoffs:
+    \item Otherwise, build an interpolation spline of $z$ (signed square root deviance
+      difference) based on profiled points (the default is $n=3 \times L$
+      where $L$ is the length of the original vector). Then
+      use linear approximation on the $y$ ($z$) and $x$ (focal
+      parameter value) of the spline
+      to find the cutoffs (\bbnote{Why construct a spline and then interpolate linearly?  Why
+        not use \code{backSpline} as in the profile plotting code?})
+      \end{itemize}
+    }
+  \item[Quad method]{Use a quadratic approximation based
+      on the estimated curvature (this is almost identical to
+      using \code{confint.default}, and perhaps obsolete/could
+      be replaced by a pointer to \code{confint.default} \ldots)
+    }
+  \item[Uniroot]{
+      For each direction (up and down):
+      \begin{itemize}
+      \item start by stepping 5 $\sigma$ away from the
+        MLE, or to the box constraint on the parameter,
+        whichever is closer (\bbnote{this standard error is based on the
+          curvature; I should allow it, or the intervals themselves,
+          to be overridden via a \code{std.err} or \code{interval}
+          parameter})
+      \item compute the difference between the deviance and
+        the desired deviance cutoff at this point;
+        if it is \code{NA}, reduce the distance in steps
+        of 0.25 $\sigma$ until it is not, until you reduce
+        the distance to zero
+      \item if the product of the deviance differences at the MLE
+        and at the point you stopped at is \code{NA} or positive
+        (indicating that you didn't find a root-crossing in the
+        range $[0,5\sigma]$), quit.
+      \item otherwise, apply \code{uniroot} across this interval
+      \end{itemize}
+      
+      \code{method="uniroot"} should give the most accurate results, 
+      especially when the profile is wonky (it won't care about non-smooth
+      profiles), but it will be the slowest --- and different confidence
+      levels will have to be computed individually, whereas multiple
+      confidence levels can be computed quickly from a single computed
+      profile.  A cruder approach would be to use profiling but decrease
+      \code{std.err} a lot so that the profile points were very closely
+      spaced.
+    }
+  \end{description}
+
+\subsubsection{Profile plotting}
+
+Plot the signed (or unsigned) square root deviance difference, and ($1-\alpha$) confidence regions/critical
+values designated by \code{conf} (default: $\{0.99,0.95,0.9,0.8,0.5\}$).
+
+\begin{itemize}
+\item * If the (signed) profile is non-monotonic, simply plot  
+  computed points with \code{type="l"} (i.e., with the default linear interpolation)
+\item Construct the interpolation spline (using \code{splines:::interpSpline}
+  rather than \code{spline} as in the confidence interval method (\bbnote{why this
+    difference?})
+\item attempt to construct the inverse of the interpolation spline (using \code{backSpline})
+\item * if this fails warn the user (assume this was due to non-monotonicity)
+  and try to use \code{uniroot} and \code{predict} to find cutoff values
+\item otherwise, use the inverse spline to find cutoff values
+\end{itemize}
+\bbnote{Why is there machinery in the plotting code to find confidence intervals?
+  Shouldn't this call \code{confint}, for consistency/fewer points of failure?}
+
+\section*{Bugs, wishes, to do}
+\begin{itemize}
+\item \textbf{WISH}: further methods and arguments: \code{subset},
+  \code{predict}, \code{resid}: \code{sim}?
+\item \textbf{WISH}: extend ICtab to allow DIC as well?
+\item minor \textbf{WISH}: 
+  better methods for extracting \code{nobs} information
+  when possible (e.g. with formula interface)
+\item \textbf{WISH}: better documentation, especially for S4 methods
+\item \textbf{WISH}: variable-length (and shaped) chunks in argument list -- cleaner division
+  between linear model specs/list of arguments/vector equivalent
+\item \textbf{WISH}: limited automatic differentiation
+  (add capability for common distributions)
+\item \textbf{WISH}: store \code{objectivefunction}
+  and \code{objectivefunctiongr} (vectorized objective/gradient
+  functions) in the \code{mle2} object (will break backward compatibility!!);
+  add accessors for these and for \code{minuslogl}
+\item \textbf{WISH}: document use of the objective function in \code{MCMCpack}
+  to do {\emph post hoc} MCMC sampling (or write my own Metropolis-Hastings
+  sampler \ldots)
+\item \textbf{WISH}: polish profile plotting, with lattice or ggplot2
+  methods
+\item \textbf{WISH}: add in/document/demonstrate ``slice'' capabilities
+\item \textbf{WISH}: refactor profiling to use stored objective functions
+  rather than re-calling \code{mle2} with \code{fixed} values mucked around
+  with in the calls???  Strip out and make generic for vectorized objective function?
+  (\code{profileModel} package only works for glm-like objects, with a linear predictor)
+\end{itemize}
+
+\bibliography{mle2}
+\end{document}

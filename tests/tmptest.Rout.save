@@ -1,0 +1,45 @@
+
+R Under development (unstable) (2012-07-27 r60013) -- "Unsuffered Consequences"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: i686-pc-linux-gnu (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(bbmle)
+> d <- data.frame(x=0:10,
++                 y=c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8))
+> 
+> maxit <- 1000
+> mle2(y~dpois(lambda=exp(lymax)/(1+x/exp(lhalf))),
++    start=list(lymax=0,lhalf=0),
++    data=d,
++      control=list(maxit=maxit),
++    parameters=list(lymax~1,lhalf~1))
+
+Call:
+mle2(minuslogl = y ~ dpois(lambda = exp(lymax)/(1 + x/exp(lhalf))), 
+    start = list(lymax = 0, lhalf = 0), data = d, parameters = list(lymax ~ 
+        1, lhalf ~ 1), control = list(maxit = maxit))
+
+Coefficients:
+   lymax    lhalf 
+3.218853 1.117035 
+
+Log-likelihood: -28.6 
+> 
+> proc.time()
+   user  system elapsed 
+  0.708   1.004   1.572 

@@ -1,16 +1,18 @@
 \documentclass{article}
 %\VignettePackage{mle2}
 %\VignetteIndexEntry{quasi: notes on quasi-likelihood/qAIC analysis inR}
-%\VignetteDepends{MuMIn,AICcmodavg}
+%\VignetteDepends{MuMIn,AICcmodavg,bbmle}
 %\VignetteEngine{knitr::knitr}
 
 \usepackage{graphicx}
+\usepackage{hyperref}
 \usepackage{url}
 \newcommand{\code}[1]{{\tt #1}}
 \title{Dealing with \code{quasi-}  models in R}
 \date{\today}
 \author{Ben Bolker}
 \begin{document}
+\newcommand{\rpkg}[1]{\href{https://CRAN.R-project.org/package=#1}{{\tt #1}}}
 \maketitle
 
 \includegraphics[width=2.64cm,height=0.93cm]{cc-attrib-nc.png}
@@ -30,8 +32,9 @@ pain, because  the R Core team (or at least the ones who wrote \code{glm},
 \code{glmmPQL}, etc.) 
 are purists and don't believe that quasi- models should report a likelihood.
 As far as I know, there are three R packages that compute/handle
-QAIC: \code{bbmle}, \code{AICcmodavg} (both on CRAN) and \code{MuMIn}
-(formerly known as \code{dRedging}, on r-forge).
+QAIC: 
+\rpkg{bbmle}, \rpkg{AICcmodavg} and \rpkg{MuMIn}.
+
 
 The basic problem is that quasi- model fits with \code{glm} return
 an \code{NA} for the log-likelihood, while the dispersion parameter
@@ -64,7 +67,7 @@ The whole problem is worse for \code{MASS::glmmPQL}, where (1) the
 authors have gone to greater efforts to make sure that the (quasi-)deviance
 is no longer preserved anywhere in the fitted model, and (2) they
 may have done it for good reason --- it is not clear whether the
-number that would get left in the 'deviance' slot at the end of
+number that would get left in the `deviance' slot at the end of
 \code{glmmPQL}'s alternating \code{lme} and \code{glm} fits is
 even meaningful to the extent that regular QAICs are.  (For 
 discussion of a similar situation, see the \code{WARNING}
@@ -128,7 +131,7 @@ on a quasi- fit:
 
 \section*{Examples}
 
-\subsection*{\code{bbmle} package (Ben Bolker), CRAN/R-forge}
+\subsection*{\code{bbmle}}
 
 <<bbmle>>=
 library(bbmle)
@@ -142,7 +145,7 @@ ICtab(glmOT.D93,glmT.D93,glmO.D93,glmX.D93,
 detach("package:bbmle")
 @ 
 
-\subsection*{\code{AICcmodavg} package (Marc Mazerolle), CRAN}
+\subsection*{\code{AICcmodavg}}
 
 <<AICcmodavg>>=
 library(AICcmodavg)
@@ -152,7 +155,7 @@ aictab(list(glmOT.D93,glmT.D93,glmO.D93,glmX.D93),
 detach("package:AICcmodavg")
 @ 
 
-\subsection*{\code{MuMIn} package (Kamil Barto{\'n})}
+\subsection*{\code{MuMIn}}
 
 <<MuMin>>=
 library(MuMIn); packageVersion("MuMIn")

@@ -110,7 +110,7 @@ x1 <- rbetabinom(n=1000,prob=0.1,size=50,theta=10)
 
 Load the package:
 <<bbmle,message=FALSE>>=
-library("bbmle")
+library(bbmle)
 @ 
 
 Construct a simple negative log-likelihood function:
@@ -410,12 +410,13 @@ anova(m0f,m2f,m3f)
 @ 
 
 The various \code{ICtab} commands produce tables of
-information criteria, optionally sorted and
-with model weights.
+information criteria; by default the results are sorted and
+presented as $\Delta$IC; there are various options, including
+printing model weights.
 <<ICtabfit>>=
-AICtab(m0f,m2f,m3f,weights=TRUE,delta=TRUE,sort=TRUE)
-BICtab(m0f,m2f,m3f,delta=TRUE,nobs=nrow(orob1),sort=TRUE,weights=TRUE)
-AICctab(m0f,m2f,m3f,delta=TRUE,nobs=nrow(orob1),sort=TRUE,weights=TRUE)
+AICtab(m0f,m2f,m3f,weights=TRUE)
+BICtab(m0f,m2f,m3f,nobs=nrow(orob1),weights=TRUE)
+AICctab(m0f,m2f,m3f,nobs=nrow(orob1),weights=TRUE)
 @ 
 <<reWarn,echo=FALSE>>=
 opts_chunk$set(warning=FALSE)
@@ -437,10 +438,10 @@ library(ggplot2)
 
 <<gg1>>=
 gg1 <- ggplot(frogdat,aes(x=size,y=killed))+geom_point()+
-      stat_sum(aes(size=factor(..n..)))+
-      labs(size="#")+scale_x_continuous(limits=c(0,40))
+      stat_sum(aes(size=..n..))+
+      labs(size="#")+scale_x_continuous(limits=c(0,40))+
+scale_size(breaks=1:3)
 @ 
-
 <<frogfit1,cache=TRUE,warning=FALSE>>=
 m3 <- mle2(killed~dbinom(prob=c*(size/d)^g*exp(1-size/d),
   size=initial),data=frogdat,start=list(c=0.5,d=5,g=1))

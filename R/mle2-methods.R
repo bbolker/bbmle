@@ -167,5 +167,5 @@ setAs("profile.mle2","data.frame",
           as.data.frame.profile.mle2(from)
           })
 
-
-BIC.mle2 <- stats4:::BIC
+## causes infinite loop, and unnecessary anyway??
+## BIC.mle2 <- stats4:::BIC

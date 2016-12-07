@@ -39,3 +39,4 @@ Collate:
     'dists.R'
     'IC.R'
     'slice.R'
+RoxygenNote: 5.0.1

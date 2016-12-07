@@ -4,8 +4,12 @@
 \title{bbmle News}
 \encoding{UTF-8}
 
-\section{Changes in version 1.0.19 (2016-02-11)}{
+\section{Changes in version 1.0.19 (2016-12-07)}{
   \itemize{
+    \item fixed bug: evaluate \code{call$method} so that
+    profiling/updating works within a function environment
+    \item make AICtab smarter about NA values
+    \item fix BIC bug (infinite recursion)
   }
 }
 

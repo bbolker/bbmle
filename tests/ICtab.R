@@ -9,3 +9,9 @@ ICtab(m1,type="qAICc",dispersion=1.2,nobs=100)
 
 m2 = glm(z~1,family=poisson)
 qAICc(m2,nobs=100,dispersion=2)
+
+## test that dAIC ignores
+m3 <- glm(z~1,family=quasipoisson)
+aa <- AICtab(m1,m2,m3,weights=TRUE)
+stopifnot(any(!is.na(aa$dAIC)),
+          any(!is.na(aa$weight)))

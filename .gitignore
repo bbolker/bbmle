@@ -35,3 +35,12 @@ vignettes/*.pdf
 # backup files
 *~
 *#
+
+# TeX/knitr stuff
+*.aux
+*.tex
+*.blg
+*.bbl
+*.log
+*.out
+*.toc

@@ -38,8 +38,8 @@ ICtab <- function(...,type=c("AIC","BIC","AICc","qAIC","qAICc"),
         if (!is.null(df <- attr(x,"df"))) return(df)
         else if (!is.null(df <- attr(logLik(x),"df"))) return(df)
     }
-    dIC <- ICs-min(ICs)
-    dlogLiks <- logLiks-min(logLiks)
+    dIC <- ICs-min(ICs,na.rm=TRUE)
+    dlogLiks <- logLiks-min(logLiks,na.rm=TRUE)
     df <- sapply(L,getdf)
     tab <- data.frame(df=df)
     if (delta) {
@@ -57,7 +57,9 @@ ICtab <- function(...,type=c("AIC","BIC","AICc","qAIC","qAICc"),
     }
     if (!delta && !base) stop("either 'base' or 'delta' must be TRUE")
     if (weights) {
-        wts <- exp(-dIC/2)/sum(exp(-dIC/2))
+        dIC_noNA <- na.exclude(dIC)
+        wts <- napredict(attr(dIC_noNA,"na.action"),
+                                    exp(-dIC_noNA/2)/sum(exp(-dIC_noNA/2)))
         tab <- data.frame(tab,weight=wts)
     }
     if (missing(mnames)) {

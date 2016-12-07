@@ -1,8 +1,7 @@
 
-R Under development (unstable) (2012-07-27 r60013) -- "Unsuffered Consequences"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
-Platform: i686-pc-linux-gnu (32-bit)
+R Under development (unstable) (2016-12-05 r71733) -- "Unsuffered Consequences"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -19,6 +18,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(bbmle)
+Loading required package: stats4
 > 
 > set.seed(101)
 > z = rpois(100,lambda=5)
@@ -33,6 +33,12 @@ m1 0      1
 > qAICc(m2,nobs=100,dispersion=2)
 [1] 226.1823
 > 
+> ## test that dAIC ignores
+> m3 <- glm(z~1,family=quasipoisson)
+> aa <- AICtab(m1,m2,m3,weights=TRUE)
+> stopifnot(any(!is.na(aa$dAIC)),
++           any(!is.na(aa$weight)))
+> 
 > proc.time()
    user  system elapsed 
-  0.704   1.028   1.583 
+  1.140   0.212   1.648 

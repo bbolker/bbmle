@@ -78,6 +78,83 @@ get_all_trange <- function(params,fun,lower,upper,cutoff=10,...) {
 }
 
 ## generic function (S3)
+
+
+#' Calculate likelihood "slices"
+#' 
+#' Computes cross-section(s) of a multi-dimensional likelihood surface
+#' 
+#' Slices provide a lighter-weight way to explore likelihood surfaces than
+#' profiles, since they vary a single parameter rather than optimizing over all
+#' but one or two parameters.
+#' 
+#' \describe{ \item{slice}{is a generic method} \item{slice1D}{creates
+#' one-dimensional slices, by default of all parameters of a model}
+#' \item{slice2D}{creates two-dimensional slices, by default of all pairs of
+#' parameters in a model} \item{slicetrans}{creates a slice along a transect
+#' between two specified points in parameter space (see \code{calcslice} in the
+#' \code{emdbook} package)} }
+#' 
+#' @aliases slice sliceOld slicetrans slice1D slice2D
+#' @param x a fitted model object of some sort
+#' @param dim dimensionality of slices (1 or 2)
+#' @param params a named vector of baseline parameter values
+#' @param params2 a vector of parameter values
+#' @param fun an objective function
+#' @param nt (integer) number of slice-steps to take
+#' @param lower lower bound(s) (stub?)
+#' @param upper upper bound(s) (stub?)
+#' @param cutoff maximum increase in objective function to allow when computing
+#' ranges
+#' @param extend (numeric) fraction by which to extend range beyond specified
+#' points
+#' @param verbose print verbose output?
+#' @param fitted A fitted maximum likelihood model of class \dQuote{mle2}
+#' @param which a numeric or character vector describing which parameters to
+#' profile (default is to profile all parameters)
+#' @param maxsteps maximum number of steps to take looking for an upper value
+#' of the negative log-likelihood
+#' @param alpha maximum (two-sided) likelihood ratio test confidence level to
+#' find
+#' @param zmax maximum value of signed square root of deviance difference to
+#' find (default value corresponds to a 2-tailed chi-squared test at level
+#' alpha)
+#' @param del step size for profiling
+#' @param trace (logical) produce tracing output?
+#' @param tol.newmin tolerance for diagnosing a new minimum below the minimum
+#' deviance estimated in initial fit is found
+#' @param tranges a two-column matrix giving lower and upper bounds for each
+#' parameter
+#' @param \dots additional arguments (not used)
+#' @return An object of class \code{slice} with \describe{ \item{slices}{a list
+#' of individual parameter (or parameter-pair) slices, each of which is a data
+#' frame with elements \describe{ \item{var1}{name of the first variable}
+#' \item{var2}{(for 2D slices) name of the second variable} \item{x}{parameter
+#' values} \item{y}{(for 2D slices) parameter values} \item{z}{slice values}
+#' \item{ranges}{a list (?) of the ranges for each parameter}
+#' \item{params}{vector of baseline parameter values} \item{dim}{1 or 2} } }
+#' \code{sliceOld} returns instead a list with elements \code{profile} and
+#' \code{summary} (see \code{\link{profile.mle2}}) }
+#' @author Ben Bolker
+#' @seealso \code{\link{profile}}
+#' @keywords misc
+#' @examples
+#' 
+#' x <- 0:10
+#' y <- c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)
+#' d <- data.frame(x,y)
+#' fit1 <- mle2(y~dpois(lambda=exp(lymax)/(1+x/exp(lhalf))),
+#'    start=list(lymax=0,lhalf=0),
+#'    data=d)
+#' s1 <- slice(fit1,verbose=FALSE)
+#' s2 <- slice(fit1,dim=2,verbose=FALSE)
+#' require(lattice)
+#' plot(s1)
+#' plot(s2)
+#' ## 'transect' slice, from best-fit values to another point
+#' st <- slice(fit1,params2=c(5,0.5))
+#' plot(st)
+#' 
 slice <- function (x, dim=1, ...)  {
     UseMethod("slice")
 }

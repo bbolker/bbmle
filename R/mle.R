@@ -166,7 +166,7 @@ mle2 <- function(minuslogl,
                  use.ginv=TRUE,
                  trace=FALSE,
                  browse_obj=FALSE,
-                 gr,
+                 gr=NULL,
                  optimfun,
                  ...) {
 
@@ -328,7 +328,7 @@ mle2 <- function(minuslogl,
       do.call("minuslogl",namedrop(args))
   } ## end of objective function
   objectivefunctiongr <-
-    if (missing(gr)) NULL else
+    if (!is.null(gr))
         function(p) {
           if (browse_obj) browser()
           l <- relist2(p,template) ## redo list structure
@@ -368,7 +368,7 @@ mle2 <- function(minuslogl,
       mapply(assign,names(d),d,
              MoreArgs=list(envir=newenv))
       environment(minuslogl) <- newenv
-      if (!missing(gr)) {
+      if (!is.null(gr)) {
           newenvgr <- new.env(hash=TRUE,parent=environment(minuslogl))
           mapply(assign,names(d),d,
                  MoreArgs=list(envir=newenvgr))
@@ -526,7 +526,7 @@ mle2 <- function(minuslogl,
   ## compute termination info
   ## FIXME: should we worry about parscale here??
   if (length(coef)) {
-    gradvec <- if (!missing(gr)) {
+    gradvec <- if (!is.null(gr)) {
         objectivefunctiongr(coef)
     } else {
         if (inherits(tt <- try(grad(objectivefunction,coef),silent=TRUE),

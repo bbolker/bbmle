@@ -18,7 +18,7 @@ hessian.opts=NULL,
 use.ginv=TRUE,
 trace=FALSE,
 browse_obj=FALSE,
-gr,
+gr=NULL,
 optimfun,\dots)
 calc_mle2_function(formula,parameters, links, start,
    parnames, use.deriv=FALSE, data=NULL,trace=FALSE)

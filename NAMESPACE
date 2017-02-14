@@ -15,7 +15,7 @@ importFrom(stats,
            simulate,predict,formula,napredict,na.omit,na.exclude)
 importFrom(methods,setMethod)
 importFrom(lattice,xyplot,splom,diag.panel.splom,panel.abline,panel.number,panel.points,panel.xyplot)  ## for slice methods
-importFrom(numDeriv,hessian,grad)
+importFrom(numDeriv,hessian,grad,jacobian)
 importFrom("grDevices", "dev.interactive")
 importFrom("graphics", "abline", "lines", "par", "points", "text")
 importFrom("methods", "new")

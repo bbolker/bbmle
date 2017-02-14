@@ -10,6 +10,7 @@
     profiling/updating works within a function environment
     \item make AICtab smarter about NA values
     \item fix BIC bug (infinite recursion)
+    \item hessian computation uses gr if provided
   }
 }
 

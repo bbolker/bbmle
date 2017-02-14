@@ -476,9 +476,7 @@ mle2 <- function(minuslogl,
     names(oout$par) <- names(start)
   }
 
-  ## FIXME: worry about boundary violations?
-  ## (if we're on the boundary then the Hessian may not be useful anyway)
-  ##
+  ## compute Hessian
   if (length(oout$par)==0) skip.hessian <- TRUE
   if (!skip.hessian) {
     if ((!is.null(call$upper) || !is.null(call$lower)) &&
@@ -488,13 +486,28 @@ mle2 <- function(minuslogl,
   namatrix <- matrix(NA,nrow=length(start),ncol=length(start))
   if (!skip.hessian) {
     psc <- call$control$parscale
-    if (is.null(psc)) {
-      oout$hessian <- try(hessian(objectivefunction,oout$par,method.args=hessian.opts))
-    } else {
-      tmpf <- function(x) {
-        objectivefunction(x*psc)
-      }
-      oout$hessian <- try(hessian(tmpf,oout$par/psc,method.args=hessian.opts))/outer(psc,psc)
+    if (is.null(gr)) {
+        if (is.null(psc)) {
+            oout$hessian <- try(hessian(objectivefunction,oout$par,
+                                        method.args=hessian.opts))
+        } else {
+            tmpf <- function(x) {
+                objectivefunction(x*psc)
+            }
+            oout$hessian <- try(hessian(tmpf,oout$par/psc,
+                                 method.args=hessian.opts))/outer(psc,psc)
+        }
+    } else { ## gradient provided
+        if (is.null(psc)) {
+            oout$hessian <- try(jacobian(objectivefunctiongr,oout$par,
+                                        method.args=hessian.opts))
+        } else {
+            tmpf <- function(x) {
+                objectivefunctiongr(x*psc)
+            }
+            oout$hessian <- try(jacobian(tmpf,oout$par/psc,
+                                 method.args=hessian.opts))/outer(psc,psc)
+        }
     }
   }
   if (skip.hessian || inherits(oout$hessian,"try-error"))

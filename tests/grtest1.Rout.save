@@ -1,6 +1,6 @@
 
-R Under development (unstable) (2016-02-09 r70138) -- "Unsuffered Consequences"
-Copyright (C) 2016 The R Foundation for Statistical Computing
+R Under development (unstable) (2017-02-13 r72168) -- "Unsuffered Consequences"
+Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -24,37 +24,22 @@ Loading required package: stats4
 > f.g <- function(x,a) 2*x
 > f.g2 <- function(x,a) c(2*x,0)
 > options(digits=3)
-> mle2(f,fixed=list(a=1))
-
-Call:
-mle2(minuslogl = f, fixed = list(a = 1))
-
-Coefficients:
-       x        a 
-1.09e-13 1.00e+00 
-
-Log-likelihood: 1 
-> mle2(f,gr=f.g,fixed=list(a=1))
-
-Call:
-mle2(minuslogl = f, fixed = list(a = 1), gr = f.g)
-
-Coefficients:
-x a 
-0 1 
-
-Log-likelihood: 1 
-> mle2(f,gr=f.g2,fixed=list(a=1))
-
-Call:
-mle2(minuslogl = f, fixed = list(a = 1), gr = f.g2)
-
-Coefficients:
-x a 
-0 1 
-
-Log-likelihood: 1 
-> 
-> proc.time()
-   user  system elapsed 
-  0.436   0.044   0.488 
+> m1 <- mle2(f,fixed=list(a=1))
+> m2 <- mle2(f,gr=f.g,fixed=list(a=1))
+Error in jacobian(objectivefunctiongr, oout$par, method.args = hessian.opts) : 
+  could not find function "jacobian"
+Warning message:
+In mle2(f, gr = f.g, fixed = list(a = 1)) : couldn't invert Hessian
+> m3 <- mle2(f,gr=f.g2,fixed=list(a=1))
+Error in jacobian(objectivefunctiongr, oout$par, method.args = hessian.opts) : 
+  could not find function "jacobian"
+Warning message:
+In mle2(f, gr = f.g2, fixed = list(a = 1)) : couldn't invert Hessian
+> stopifnot(all.equal(coef(m1),coef(m2)))
+> stopifnot(all.equal(coef(m1),coef(m3)))
+> tt <- function(x) x@details$hessian
+> stopifnot(all.equal(tt(m1),tt(m2),tolerance=1e-6))
+Error: tt(m1) and tt(m2) are not equal:
+  Modes: numeric, logical
+  'is.NA' value mismatch: 1 in current 0 in target
+Execution halted

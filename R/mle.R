@@ -549,7 +549,7 @@ mle2 <- function(minuslogl,
     if (!skip.hessian) {
         if (inherits(ev <- try(eigen(oout$hessian)$value,silent=TRUE),
                      "try-error")) ev <- NA
-        oout$eratio <- min(ev)/max(ev)
+        oout$eratio <- min(Re(ev))/max(Re(ev))
     }
   }
   if (!is.null(conv <- oout$conv) &&

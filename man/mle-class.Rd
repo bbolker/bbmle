@@ -39,13 +39,13 @@
     \item{\code{method}:}{(character) The optimization method used.}
     \item{\code{formula}:}{(character) If a formula was specified, a
       character vector giving the formula and parameter specifications.}
-}
+  }
 }
 \section{Methods}{
   \describe{
     \item{coef}{\code{signature(object = "mle2")}: Extract coefficients.
       If \code{exclude.fixed=TRUE} (it is \code{FALSE} by default),
-      only the non-fixed parameter values are returned.}t
+      only the non-fixed parameter values are returned.}
     \item{confint}{\code{signature(object = "mle2")}: Confidence
       intervals from likelihood profiles, or quadratic approximations,
       or root-finding.}
@@ -61,7 +61,7 @@
       profile. }
   }
 }
-\details{
+\section{Details on the confint method}{
   When the parameters in the original fit are constrained using
   \code{lower} or \code{upper}, or when \code{prof.lower} or
   \code{prof.upper} are set, and the confidence intervals lie
@@ -73,7 +73,6 @@
   (If you have a strong opinion about the need for a new
   option to \code{confint} that sets the bounds to the limits
   automatically, please contact the package maintainer.)
-  
 }
 \examples{
 x <- 0:10

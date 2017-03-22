@@ -6,10 +6,9 @@
 ##  (default?), and "extrap" (linear extrapolation from previous two fits)
 ## 
 
-setMethod("profile", "mle2",
-          function (fitted, which = 1:p, maxsteps = 100,
-                    alpha = 0.01, zmax = sqrt(qchisq(1 - alpha/2, p)),
-                    del = zmax/5, trace = FALSE, skiperrs=TRUE,
+proffun <- function (fitted, which = 1:p, maxsteps = 100,
+                     alpha = 0.01, zmax = sqrt(qchisq(1 - alpha/2, p)),
+                     del = zmax/5, trace = FALSE, skiperrs=TRUE,
                     std.err, tol.newmin = 0.001, debug=FALSE,
                     prof.lower, prof.upper, skip.hessian=TRUE,
                     continuation = c("none","naive","linear"),
@@ -271,6 +270,14 @@ setMethod("profile", "mle2",
         prof[[p.i]] <- data.frame(z = zi[si])
         prof[[p.i]]$par.vals <- pvi[si,, drop=FALSE]
     } ## for i in which
+    return(prof)
+}
+setMethod("profile", "mle2",
+function(fitted,...) {
+    ## cc <- match.call()
+    ## cc[[1]] <- quote(proffun)
+    ## prof <- eval.parent(cc)
+    prof <- proffun(fitted,...)
     newprof <- new("profile.mle2", profile = prof, summary = summ)
     attr(newprof,"stop_msg") <- stop_msg
     newprof

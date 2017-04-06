@@ -270,7 +270,7 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
         prof[[p.i]] <- data.frame(z = zi[si])
         prof[[p.i]]$par.vals <- pvi[si,, drop=FALSE]
     } ## for i in which
-    return(prof)
+    return(list(prof=prof,summ=summ,stop_msg=stop_msg))
 }
 setMethod("profile", "mle2",
 function(fitted,...) {
@@ -278,8 +278,8 @@ function(fitted,...) {
     ## cc[[1]] <- quote(proffun)
     ## prof <- eval.parent(cc)
     prof <- proffun(fitted,...)
-    newprof <- new("profile.mle2", profile = prof, summary = summ)
-    attr(newprof,"stop_msg") <- stop_msg
+    newprof <- new("profile.mle2", profile = prof$prof, summary = prof$summ)
+    attr(newprof,"stop_msg") <- prof$stop_msg
     newprof
 })
 

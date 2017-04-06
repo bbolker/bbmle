@@ -1,5 +1,6 @@
 \name{profile-methods}
 \docType{methods}
+\alias{proffun}
 \alias{profile-methods}
 \alias{profile,mle2-method}
 \alias{profile.mle2}
@@ -9,14 +10,16 @@
 }
 
 \usage{
-\S4method{profile}{mle2}(fitted, which = 1:p, maxsteps = 100,
+proffun(fitted, which = 1:p, maxsteps = 100,
                     alpha = 0.01, zmax = sqrt(qchisq(1 - alpha/2, p)),
                     del = zmax/5, trace = FALSE, skiperrs=TRUE,
                     std.err, 
                     tol.newmin = 0.001, debug=FALSE,
                     prof.lower, prof.upper,
+                    skip.hessian = TRUE,
                     continuation = c("none","naive","linear"),
-                    skip.hessian = TRUE, try_harder=FALSE, \dots)
+                    try_harder=FALSE, \dots)
+\S4method{profile}{mle2}(fitted, \dots)
 }
 \arguments{
   \item{fitted}{A fitted maximum likelihood model of class
@@ -53,6 +56,9 @@ profile, try to continue anyway?}
   \item{\dots}{additional arguments (not used)}
 }
 \details{
+  \code{proffun} is the guts of the profile method, exposed
+  so that other packages can use it directly.
+  
   See the vignette (\code{vignette("mle2",package="bbmle")})
   for more technical details of how profiling is done.
  }

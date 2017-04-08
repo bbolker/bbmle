@@ -103,7 +103,7 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
             zi <<- c(zi, z) ## nb GLOBAL set
         }
         if (trace) cat(bi, z, "\n")
-        z
+        return(z)
     } ## end onestep
     ## Profile the likelihood around its maximum
     ## Based on profile.glm in MASS
@@ -278,6 +278,7 @@ function(fitted,...) {
     ## cc[[1]] <- quote(proffun)
     ## prof <- eval.parent(cc)
     prof <- proffun(fitted,...)
+    if (is(prof,"mle2")) return(prof)
     newprof <- new("profile.mle2", profile = prof$prof, summary = prof$summ)
     attr(newprof,"stop_msg") <- prof$stop_msg
     newprof

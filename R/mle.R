@@ -379,7 +379,8 @@ mle2 <- function(minuslogl,
     optimizer <- "none"
     skip.hessian <- TRUE
     oout <- list(par=start, value=objectivefunction(start),
-                 hessian = matrix(NA,nrow=length(start),ncol=length(start)))
+                 hessian = matrix(NA,nrow=length(start),ncol=length(start)),
+                 convergence=0)
   } else {
     oout <- switch(optimizer,
                    optim = {

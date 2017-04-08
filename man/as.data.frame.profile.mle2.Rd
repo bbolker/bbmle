@@ -31,12 +31,13 @@ optional=FALSE, \dots)
   x <- 0:10
   y <- c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)
   library(bbmle)
-  LL <- function(ymax=15, xhalf=6)
-  -sum(stats::dpois(y, lambda=ymax/(1+x/xhalf), log=TRUE))
+  LL <- function(ymax=15, xhalf=6) {
+        -sum(stats::dpois(y, lambda=ymax/(1+x/xhalf), log=TRUE))
+    }
   ## uses default parameters of LL
   fit1 <- mle2(LL)
   p1 <- profile(fit1)
-  d1 = as.data.frame(p1)
+  d1 <- as.data.frame(p1)
   library(lattice)
   xyplot(abs(z)~focal|param,data=d1,
     subset=abs(z)<3,

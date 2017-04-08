@@ -212,6 +212,7 @@ mle2(y~dpois(lambda=exp(lymax)/(1+x/exp(lhalf))),
    data=d,
    parameters=list(lymax~1,lhalf~1))
 
+\dontrun{
 ## try bounded optimization with nlminb and constrOptim
 (fit1B <- mle2(LL, optimizer="nlminb", lower=c(lymax=1e-7, lhalf=1e-7)))
 p1B <- profile(fit1B)
@@ -219,7 +220,6 @@ confint(p1B)
 (fit1C <- mle2(LL, optimizer="constrOptim", ui = c(lymax=1,lhalf=1), ci=2,
    method="Nelder-Mead"))
 
-\dontrun{
 set.seed(1001)
 lymax <- c(0,2)
 lhalf <- 0

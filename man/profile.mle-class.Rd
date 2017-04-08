@@ -131,6 +131,7 @@ suppressWarnings(confint(fit1,method="uniroot"))
 ## alternatively, we can use box constraints to keep ourselves
 ##  to positive parameter values ...
 fit2 <- update(fit1,method="L-BFGS-B",lower=c(ymax=0.001,xhalf=0.001))
+\dontrun{
 p2 <- profile(fit2)
 plot(p2,show.points=TRUE)
 ## but the fit for ymax is just bad enough that the spline gets wonky
@@ -139,7 +140,6 @@ confint(fit2,method="uniroot")
 ## bobyqa is a better-behaved bounded optimizer ...
 ##  BUT recent (development, 2012.5.24) versions of
 ##    optimx no longer allow single-parameter fits!
-\dontrun{
 if (require(optimx)) {
   fit3 <- update(fit1,
       optimizer="optimx",

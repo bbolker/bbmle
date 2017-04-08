@@ -4,14 +4,19 @@
 \title{bbmle News}
 \encoding{UTF-8}
 
-\section{Changes in version 1.0.19 (2016-12-07)}{
+\section{Changes in version 1.0.19 (2017-04-08)}{
   \itemize{
     \item fixed bug: evaluate \code{call$method} so that
     profiling/updating works within a function environment
     \item make AICtab smarter about NA values
     \item fix BIC bug (infinite recursion)
-    \item hessian computation uses gr if provided
-    \item basic continuation method implemented for profiling
+    \item hessian computation uses gradient function if provided
+    \item basic continuation method implemented for profiling (with
+    stubs for smarter methods)
+    \item mle2 stores its calling environment for more flexibility
+    when re-evaluating, e.g. in profiling (could lead to occasional
+    surprises, e.g. if saving a fitted mle2 object with large objects
+    in its calling environment)
   }
 }
 

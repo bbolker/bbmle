@@ -219,6 +219,7 @@ confint(p1B)
 (fit1C <- mle2(LL, optimizer="constrOptim", ui = c(lymax=1,lhalf=1), ci=2,
    method="Nelder-Mead"))
 
+\dontrun{
 set.seed(1001)
 lymax <- c(0,2)
 lhalf <- 0
@@ -230,6 +231,7 @@ d2 <- data.frame(x,g,y)
 fit3 <- mle2(y~dnbinom(mu=exp(lymax)/(1+x/exp(lhalf)),size=exp(logk)),
     parameters=list(lymax~g),data=d2,
     start=list(lymax=0,lhalf=0,logk=0))
+}
 }
 \keyword{models}
 

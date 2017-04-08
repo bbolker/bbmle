@@ -372,6 +372,7 @@ mle2 <- function(minuslogl,
           newenvgr <- new.env(hash=TRUE,parent=environment(minuslogl))
           mapply(assign,names(d),d,
                  MoreArgs=list(envir=newenvgr))
+          environment(gr) <- newenvgr
       }
   }
   if (length(start)==0 || eval.only) {
@@ -575,6 +576,7 @@ mle2 <- function(minuslogl,
            optimizer=optimizer,data=as.list(data),formula=formula)
   attr(m,"df") = length(m@coef)
   if (!missing(data)) attr(m,"nobs") = length(data[[1]])
+  environment(m) <- parent.frame()
   ## to work with BIC as well
   m
 }

@@ -59,8 +59,9 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
         ## now try to fit ...
         if (skiperrs) {
             pfit <<- try(eval.parent(call, 2L), silent=TRUE)
+            pfit <<- try(eval(call, environment(fitted)), silent=TRUE)
         } else {
-            pfit <<- eval.parent(call, 2L)
+            pfit <<- eval(call, environment(fitted))
         }
         ok <- ! inherits(pfit,"try-error")
         if (debug && ok) cat(coef(pfit),-logLik(pfit),"\n")

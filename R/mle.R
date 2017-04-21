@@ -357,7 +357,7 @@ mle2 <- function(minuslogl,
                   stop("name/length mismatch in gradient function")
               names(v) <- vnames
           }
-          v[!names(v) %in% nfix] ## from Eric Weese
+          return(v[!names(v) %in% nfix]) ## from Eric Weese
         } ## end of gradient function
   ## FIXME: try to do this by assignment into appropriate
   ##    environments rather than replacing them ...

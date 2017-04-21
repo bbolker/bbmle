@@ -54,7 +54,6 @@ gradlikfun <- function(p,dat,times,N,incid=TRUE) {
 N <- 1000
 p0 <- c(x0=0.1,lambda=1,sigma=0.5,alpha=0.5)
 t0 <- 1:10
-
 ## deterministic versions of data  (cumulative and incidence)
 dcdat <- model_richardson(t0,p0,N)
 ddat <- diff(dcdat)
@@ -75,11 +74,18 @@ grad(likfun,p0,dat=ddat,times=t0,N=N)  ## finite differences
 library(bbmle)
 parnames(likfun) <- names(p0)
 
+
 m1 <- mle2(likfun,start=p0,gr=gradlikfun,data=list(times=t0,N=N,dat=ddat),
            vecpar=TRUE)
 
 plot(t0[-1],ddat)
 lines(t0[-1],calc_mean(coef(m1),times=t0,N=N))
+
+if (FALSE) {
+  ## too slow ..
+  pp0 <- profile(m1)
+  pp0C <- profile(m1,continuation="naive")
+} 
 
 pp1 <- profile(m1,which="lambda")
 

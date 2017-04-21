@@ -28,3 +28,4 @@ cache/.*
 README.md
 revdep/
 LICENSE
+.*.RData

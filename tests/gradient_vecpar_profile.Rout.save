@@ -1,8 +1,7 @@
 
-R Under development (unstable) (2012-07-27 r60013) -- "Unsuffered Consequences"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
-Platform: i686-pc-linux-gnu (32-bit)
+R Under development (unstable) (2017-04-17 r72531) -- "Unsuffered Consequences"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -18,7 +17,10 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
+[Previously saved workspace restored]
+
 > library(bbmle)
+Loading required package: stats4
 > 
 > ## Simulate data
 > 
@@ -47,7 +49,6 @@ Type 'q()' to quit R.
 +   dnllda <- -sum(((y-model(a,b))/0.1)*x/0.1)
 +   dnlldb <- -sum(((y-model(a,b))/0.1)*1/0.1)
 +   return(c(dnllda, dnlldb))
-+   
 + })
 > 
 > ## optimization
@@ -58,10 +59,47 @@ Type 'q()' to quit R.
 > fit <- mle2(nll, c(a = 1, b=2), gr=gr)
 > 
 > myprof <- profile(fit)
+> myprof_c <- profile(fit,continuation="naive")
+> confint(myprof)
+      2.5 %   97.5 %
+a 1.9712561 2.095215
+b 0.7076574 1.118783
+> confint(myprof_c)
+      2.5 %   97.5 %
+a 1.9712561 2.095215
+b 0.7076574 1.118783
 > 
 > fit <- mle2(nll, c(a = 1, b=2), gr=gr, skip.hessian=TRUE)
 > myprof2 <- profile(fit,std.err=c(0.1,0.1))
 > 
+> ## incomplete!
+> model2 <- ~a+b*x+c*x^2
+> f0 <- deriv(model2,"x",function.arg=c("a","b","c"))
+> ## chain rule
+> f1 <- function() {
++ ## memoize
++ lastpar <- NULL
++ lastval <- NULL
++ }
+> 
+> f2 <- function(par) {
++     if (par==lastpar) {
++         return(c(lastval))
++     }
++     lastpar <<- par
++     lastval <<- do.call(f0,par)
++     f1(par)
++ }
+> f2.gr <- function(par) {
++     if (par==lastpar) {
++         return(attr(lastval,".grad"))
++     }
++     lastpar <<- par
++     lastval <<- do.call(f0,par)
++     f1.gr(par)
++ }
+> parnames(f2) <- parnames(f2.gr) <- c("a","b","c")
+> 
 > proc.time()
    user  system elapsed 
-  1.028   1.072   1.970 
+  1.844   0.128   3.349 

@@ -1,8 +1,7 @@
 
-R Under development (unstable) (2012-07-27 r60013) -- "Unsuffered Consequences"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
-Platform: i686-pc-linux-gnu (32-bit)
+R Under development (unstable) (2017-04-17 r72531) -- "Unsuffered Consequences"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -74,7 +73,6 @@ Type 'q()' to quit R.
 > N <- 1000
 > p0 <- c(x0=0.1,lambda=1,sigma=0.5,alpha=0.5)
 > t0 <- 1:10
-> 
 > ## deterministic versions of data  (cumulative and incidence)
 > dcdat <- model_richardson(t0,p0,N)
 > ddat <- diff(dcdat)
@@ -97,7 +95,9 @@ Type 'q()' to quit R.
 > ## matches!
 > 
 > library(bbmle)
+Loading required package: stats4
 > parnames(likfun) <- names(p0)
+> 
 > 
 > m1 <- mle2(likfun,start=p0,gr=gradlikfun,data=list(times=t0,N=N,dat=ddat),
 +            vecpar=TRUE)
@@ -111,6 +111,12 @@ Warning messages:
 > 
 > plot(t0[-1],ddat)
 > lines(t0[-1],calc_mean(coef(m1),times=t0,N=N))
+> 
+> if (FALSE) {
++   ## too slow ..
++   pp0 <- profile(m1)
++   pp0C <- profile(m1,continuation="naive")
++ } 
 > 
 > pp1 <- profile(m1,which="lambda")
 There were 50 or more warnings (use warnings() to see the first 50)
@@ -136,4 +142,4 @@ In .local(x, ...) :
 > 
 > proc.time()
    user  system elapsed 
-  8.528   1.180   9.627 
+  7.072   0.628   9.701 

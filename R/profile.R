@@ -58,15 +58,16 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
         }
         ## now try to fit ...
         if (skiperrs) {
-            pfit <<- try(eval.parent(call, 2L), silent=TRUE)
-            pfit <<- try(eval(call, environment(fitted)), silent=TRUE)
+            pfit0 <- try(eval(call, environment(fitted)), silent=TRUE)
         } else {
-            pfit <<- eval(call, environment(fitted))
+            pfit0 <- eval(call, environment(fitted))
         }
-        ok <- ! inherits(pfit,"try-error")
+        ok <- !inherits(pfit0,"try-error")
+        ## don't overwrite pfit in environment until we know it's OK ...
+        if (ok) pfit <<- pfit0
         if (debug && ok) cat(coef(pfit),-logLik(pfit),"\n")
         if(skiperrs && !ok) {
-            warning(paste("Error encountered in profile:",pfit))
+            warning(paste("Error encountered in profile:",pfit0))
             return(NA)
         }
         else {
@@ -206,6 +207,7 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
                            break
                        }
                        z <- onestep(step)
+                       if (newpars_found) return(z)
                        ## stop on flat spot, unless try_harder
                        if (step>1 && (identical(oldcurval,curval) || identical(oldz,z))) {
                            stop_flat <- TRUE
@@ -215,14 +217,12 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
                        }
                        oldcurval <- curval
                        oldz <- z
-                       if (newpars_found) return(z)
                        if(is.na(z)) {
                            stop_na <- TRUE
                            stop_msg[[i]][[dir_ind]] <- paste(stop_msg[[i]][[dir_ind]],wfun("hit NA"),sep=";")
                            if (!try_harder) break
                        }
                        lastz <- z
-                       if (newpars_found) return(z)
                    }
             stop_cutoff <- (!is.na(z) && abs(z)>=zmax)
             stop_maxstep <- (step==maxsteps)
@@ -253,6 +253,7 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
                         if (debug) cat(wfun("bounded and didn't make it, try at boundary"),"\n")
                         ## bounded and didn't make it, try at boundary
                         if (sgn==-1 && B0[i]>lbound) z <- onestep(bi=lbound)
+                        if (newpars_found) return(z)
                         if (sgn==1  && B0[i]<ubound) z <- onestep(bi=ubound)
                         if (newpars_found) return(z)
                     }
@@ -263,6 +264,7 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
                     step <- 0.5
                     while ((step <- step + 1) < mxstep) {
                         z <- onestep(step)
+                        if (newpars_found) return(z)
                     }
                 } ## smaller steps
             } ## !zero stepsize
@@ -273,6 +275,7 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
     } ## for i in which
     return(list(prof=prof,summ=summ,stop_msg=stop_msg))
 }
+
 setMethod("profile", "mle2",
 function(fitted,...) {
     ## cc <- match.call()

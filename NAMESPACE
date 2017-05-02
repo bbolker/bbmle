@@ -4,7 +4,7 @@ export(ICtab,AICtab,BICtab,AICctab)
 export(stdEr,vcov)
 export(slice,sliceOld,slice1D,slice2D)
 export(proffun)
-exportClasses(mle2)
+exportClasses(mle2,summary.mle2)
 exportMethods(AIC, AICc, qAICc, qAIC, 
                profile, coef, confint, logLik,
               update, vcov, anova, deviance, residuals,

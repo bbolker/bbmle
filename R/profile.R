@@ -380,7 +380,7 @@ setMethod("plot", signature(x="profile.mle2", y="missing"),
             }
         }
         ## </FIXME>
-        if (no.xlim) xlim <- predback(c(-mlev, mlev))
+        if (no.xlim) xlim <- sort(predback(c(-mlev, mlev)))
         xvals <- obj[[i]]$par.vals[,nm[i]]
         if (is.na(xlim[1]))
             xlim[1] <- min(xvals)

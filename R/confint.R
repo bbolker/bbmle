@@ -33,7 +33,7 @@ function (object, parm, level = 0.95, trace=FALSE, ...)
         if (inherits(tt,"try-error")) tt <- rep(NA,2)
       }
     }
-    ci[Pnames[pm], ] <- tt
+    ci[Pnames[pm], ] <- sort(tt)
   }
   drop(ci)
 })

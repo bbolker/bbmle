@@ -89,6 +89,7 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
                     ## HACK for non-monotonic profiles? z <- -sgn*sqrt(abs(zz))
                 } else {
                     ## cat() instead of warning(); FIXME use message() instead???
+                    ## FIXME:  why??? shouldn't this be a warning?
                     message("Profiling has found a better solution,",
                             "so original fit had not converged:\n")
                     message(sprintf("(new deviance=%1.4g, old deviance=%1.4g, diff=%1.4g)",
@@ -98,7 +99,7 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
                     ##   to top level
                     newpars_found <<- TRUE
                     ## return(pfit@fullcoef)
-                    return(pfit) ## return full fit
+                    if (!try_harder) return(pfit) ## bail out, return full fit
                 }
             } else {
                 z <- sgn * sqrt(zz)
@@ -209,7 +210,7 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
                            break
                        }
                        z <- onestep(step)
-                       if (newpars_found) return(z)
+                       if (newpars_found && !try_harder) return(pfit)
                        ## stop on flat spot, unless try_harder
                        if (step>1 && (identical(oldcurval,curval) || identical(oldz,z))) {
                            stop_flat <- TRUE
@@ -246,18 +247,18 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
                         if ((sgn==-1 & curval<lbound) ||
                             (sgn==1 && curval>ubound)) break
                         z <- onestep(step - 1 + dstep)
-                        if (newpars_found) return(z)
+                        if (newpars_found && !try_harder) return(pfit)
                         if(is.na(z) || abs(z) > zmax) break
                         lastz <- z
-                        if (newpars_found) return(z)
+                        if (newpars_found && !try_harder) return(pfit)
                     }
                     if (!stop_cutoff && stop_bound) {
                         if (debug) cat(wfun("bounded and didn't make it, try at boundary"),"\n")
                         ## bounded and didn't make it, try at boundary
                         if (sgn==-1 && B0[i]>lbound) z <- onestep(bi=lbound)
-                        if (newpars_found) return(z)
+                        if (newpars_found && !try_harder) return(pfit)
                         if (sgn==1  && B0[i]<ubound) z <- onestep(bi=ubound)
-                        if (newpars_found) return(z)
+                        if (newpars_found && !try_harder) return(pfit)
                     }
                 } else if (length(zi) < 5) { # try smaller steps
                     if (debug) cat(wfun("try smaller steps"),"\n")
@@ -266,7 +267,7 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
                     step <- 0.5
                     while ((step <- step + 1) < mxstep) {
                         z <- onestep(step)
-                        if (newpars_found) return(z)
+                        if (newpars_found && !try_harder) return(pfit)
                     }
                 } ## smaller steps
             } ## !zero stepsize
@@ -275,6 +276,7 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
         prof[[p.i]] <- data.frame(z = zi[si])
         prof[[p.i]]$par.vals <- pvi[si,, drop=FALSE]
     } ## for i in which
+    if (newpars_found) return(pfit)
     return(list(prof=prof,summ=summ,stop_msg=stop_msg))
 }
 

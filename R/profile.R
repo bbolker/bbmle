@@ -9,10 +9,12 @@
 proffun <- function (fitted, which = 1:p, maxsteps = 100,
                      alpha = 0.01, zmax = sqrt(qchisq(1 - alpha/2, p)),
                      del = zmax/5, trace = FALSE, skiperrs=TRUE,
-                    std.err, tol.newmin = 0.001, debug=FALSE,
-                    prof.lower, prof.upper, skip.hessian=TRUE,
-                    continuation = c("none","naive","linear"),
-                    try_harder=FALSE, ...) {
+                     std.err,
+                     tol.newmin = 0.001,
+                     debug=FALSE,
+                     prof.lower, prof.upper, skip.hessian=TRUE,
+                     continuation = c("none","naive","linear"),
+                     try_harder=FALSE, ...) {
     ## fitted: mle2 object
     ## which: which parameters to profile (numeric or char)
     ## maxsteps: steps to take looking for zmax

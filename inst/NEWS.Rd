@@ -4,6 +4,12 @@
 \title{bbmle News}
 \encoding{UTF-8}
 
+\section{Changes in version 1.0.19.9000 (devel)}{
+  \itemize{
+    \item fixed buglet: flipped profile plot axes, confint for negative values
+  }
+}
+
 \section{Changes in version 1.0.19 (2017-04-08)}{
   \itemize{
     \item fixed bug: evaluate \code{call$method} so that

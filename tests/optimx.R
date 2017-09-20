@@ -1,6 +1,6 @@
 library(bbmle)
 old_opt <- options(digits=3)
-require(optimx)
+if (require(optimx)) {
 x <- 0:10
 y <- c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)
 d <- data.frame(x,y)
@@ -19,4 +19,5 @@ suppressWarnings(m1 <- mle2(minuslogl=y~dpois(lambda=ymax/(1+x/xhalf)),
 
 suppressWarnings(head(as.data.frame(profile(m1))))
 detach("package:optimx")
+}
 options(old_opt)

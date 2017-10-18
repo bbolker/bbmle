@@ -111,17 +111,17 @@ setMethod("AICc", "mle2",
                   L = c(list(object), L)
                   # First, we attempt to use the "nobs" attribute
                   if (is.null(nobs)) {
-                      nobs <- sapply(L, attr,"nobs")
+                      nobs <- unlist(lapply(L, attr,"nobs"))
                   }
                   # If that is still null, maybe there's a "nobs" method?
                   if (is.null(nobs)) {
-                      nobs <- sapply(L,nobs)
+                      nobs <- unlist(lapply(L,nobs))
                   }
                   if (length(unique(nobs))>1)
                       stop("nobs different: must have identical data for all objects")
-                  logLiks <- sapply(L, logLik)
-                  df <- sapply(L,attr,"df")
-                  val <- -2*c(logLiks)+k*df+k*df*(df+1)/(nobs-df-1)
+                  logLiks <- lapply(L, logLik)
+                  df <- sapply(logLiks,attr,"df")
+                  val <- -2*unlist(logLiks)+k*df+k*df*(df+1)/(nobs-df-1)
                   data.frame(AICc=val,df=df)
               } else {
                   if (is.null(nobs)) {
@@ -159,10 +159,9 @@ setMethod("AIC", "mle2",
               L <- list(...)
               if (length(L)) {
                   L <- c(list(object),L)
-                  if (!all(sapply(L,class)=="mle2")) stop("all objects in list must be class mle2")
                   logLiks <- lapply(L, logLik)
                   AICs <- sapply(logLiks,AIC,k=k)
-                  df <- sapply(L,attr,"df")
+                  df <- sapply(logLiks,attr,"df")
                   data.frame(AIC=AICs,df=df)
               } else AIC(logLik(object), k = k)
           })

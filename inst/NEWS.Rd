@@ -5,8 +5,15 @@
 \encoding{UTF-8}
 
 \section{Changes in version 1.0.19.9000 (devel)}{
-  \itemize{
-    \item fixed buglet: flipped profile plot axes, confint for negative values
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item fixed buglet: flipped profile plot axes, confint for negative values
+    }
+  }
+  \subsection{USER-VISIBLE CHANGES}{
+    \itemize{
+      \item \code{summary.mle2} is now exported, for use by other packages
+    }
   }
 }
 

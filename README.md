@@ -1,7 +1,7 @@
 bbmle: Maximum likelihood estimation
 ====
 
-[![Build Status](https://travis-ci.org/bbmle/bbmle.svg?branch=master)](https://travis-ci.org/bbmle/bbmle)
+[![Build Status](https://travis-ci.org/bbolker/bbmle.svg?branch=master)](https://travis-ci.org/bbolker/bbmle)
 [![cran version](http://www.r-pkg.org/badges/version/bbmle)](https://cran.r-project.org/package=bbmle)
 [![downloads](http://cranlogs.r-pkg.org/badges/bbmle)](http://cranlogs.r-pkg.org/badges/bbmle)
 [![total downloads](http://cranlogs.r-pkg.org/badges/grand-total/bbmle)](http://cranlogs.r-pkg.org/badges/grand-total/bbmle)

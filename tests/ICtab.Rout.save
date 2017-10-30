@@ -1,6 +1,6 @@
 
-R Under development (unstable) (2016-12-05 r71733) -- "Unsuffered Consequences"
-Copyright (C) 2016 The R Foundation for Statistical Computing
+R Under development (unstable) (2017-10-27 r73634) -- "Unsuffered Consequences"
+Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -16,6 +16,8 @@ Type 'contributors()' for more information and
 Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
+
+[Previously saved workspace restored]
 
 > library(bbmle)
 Loading required package: stats4
@@ -39,6 +41,18 @@ m1 0      1
 > stopifnot(any(!is.na(aa$dAIC)),
 +           any(!is.na(aa$weight)))
 > 
+> set.seed(101)
+> x <- rnorm(100)
+> dd <- data.frame(y=rnorm(100,2+3*x,sd=1),x)
+> m4A <- lm(y~x,dd)
+> m4B <- mle2(y~dnorm(mean=a+b*x,sd=exp(logsd)),
++            data=dd,
++            start=list(a=1,b=1,logsd=0))
+> ## cosmetic differences only
+> stopifnot(all.equal(AIC(m4A,m4B)[,"AIC"],
++                     AIC(m4B,m4A)[,"AIC"]))
+> 
+> 
 > proc.time()
    user  system elapsed 
-  1.140   0.212   1.648 
+  1.920   0.208   2.679 

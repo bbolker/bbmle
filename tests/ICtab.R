@@ -15,3 +15,15 @@ m3 <- glm(z~1,family=quasipoisson)
 aa <- AICtab(m1,m2,m3,weights=TRUE)
 stopifnot(any(!is.na(aa$dAIC)),
           any(!is.na(aa$weight)))
+
+set.seed(101)
+x <- rnorm(100)
+dd <- data.frame(y=rnorm(100,2+3*x,sd=1),x)
+m4A <- lm(y~x,dd)
+m4B <- mle2(y~dnorm(mean=a+b*x,sd=exp(logsd)),
+           data=dd,
+           start=list(a=1,b=1,logsd=0))
+## cosmetic differences only
+stopifnot(all.equal(AIC(m4A,m4B)[,"AIC"],
+                    AIC(m4B,m4A)[,"AIC"]))
+

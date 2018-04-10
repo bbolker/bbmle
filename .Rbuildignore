@@ -18,6 +18,7 @@ clean
 \.blg$
 \.out$
 \.tex$
+\.toc
 \.tar.gz$
 jss\.cls
 framed.sty

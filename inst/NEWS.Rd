@@ -4,6 +4,14 @@
 \title{bbmle News}
 \encoding{UTF-8}
 
+\section{Changes in version 1.0.21}{
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item fixed bug: intercept-only parameters handled wrong (GH #8)
+    }
+  }
+}
+
 \section{Changes in version 1.0.20 (2017-10-30)}{
   \subsection{BUG FIXES}{
     \itemize{

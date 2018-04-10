@@ -309,3 +309,18 @@ totmeansurv <- with(GS2,mean((d1+d2)/2))
 mle2(cbind(day1,day2)~dicweib(exp(shape),exp(scale)),
      parameters=list(scale~fexper+qual*density),
      start=list(scale=log(totmeansurv),shape=0),data=GS2)
+
+## GH 8
+set.seed(1001)
+lymax <- c(0,2)
+lhalf <- 0
+x <- sort(runif(200))
+g <- factor(sample(c("a","b"),200,replace=TRUE))
+y <- rnbinom(200,mu=exp(lymax[g])/(1+x/exp(lhalf)),size=2)
+d2 <- data.frame(x,g,y)
+fit3b <- mle2(y~dnbinom(mu=exp(lymax)/(1+x/exp(lhalf)),size=exp(logk)),
+    parameters=list(lhalf~1,lymax~g),data=d2,
+    start=list(lhalf=0,lymax=0,logk=0))
+coef(fit3b)
+stopifnot(all.equal(names(coef(fit3b)),
+                    c("lhalf", "lymax.(Intercept)", "lymax.gb", "logk")))

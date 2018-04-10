@@ -48,47 +48,50 @@ calc_mle2_function <- function(formula,
     } else {
       models <- as.character(parameters)
     }
-    models <- gsub(" ","",models)
-    parameters <- parameters[models!="1"]
-    npars <- length(parameters)
-    if (npars==0) { ## no non-constant parameters
-      parameters <- mmats <- vpos <- NULL
-    } else {
-      ## BUG IN HERE SOMEWHERE, FIXME: SENSITIVE TO ORDER OF 'start'
-      mmats <- list()
-      vpos <- list()
-      pnames0 <- parnames
-      names(parnames) <- parnames
-      for (i in seq(along=parameters)) {
-        vname <- vars[i]      ## name of variable
-        p <- parameters[[i]]  ## formula for variable
-        p[[2]] <- NULL
-        mmat <- model.matrix(p,data=data)     
-        pnames <- paste(vname,colnames(mmat),sep=".")
-        parnames[[vname]] <- pnames ## insert into parameter names
-        vpos0 <- which(pnames0==vname)
-        vposvals <- cumsum(sapply(parnames,length))
-        ## fill out start vectors with zeros or replicates as appropriate
-        if (length(start[[vname]])==1) {
-            if (length(grep("-1",models[i])>0)) {
-                start[[vname]] <- rep(start[[vname]],length(pnames))
-            } else {
-                start[[vname]] <- c(start[[vname]],rep(0,length(pnames)-1))
-            }
-        }
-        ## fix: what if parameters are already correctly specified?
-        startpos <- if (vpos0==1) 1 else vposvals[vpos0-1]+1
-        vpos[[vname]] <- startpos:vposvals[vpos0]
-        mmats[[vname]] <- mmat
+      models <- gsub(" ","",models)
+      ## remove intercept-only models
+      not.int.only <- models!="1"
+      parameters <- parameters[not.int.only]
+      vars <- vars[not.int.only]
+      npars <- length(parameters)
+      if (npars==0) { ## no non-constant parameters
+          parameters <- mmats <- vpos <- NULL
+      } else {
+          ## BUG IN HERE SOMEWHERE, FIXME: SENSITIVE TO ORDER OF 'start'
+          mmats <- list() ## model matrices
+          vpos <- list()
+          pnames0 <- parnames
+          names(parnames) <- parnames
+          for (i in seq(along=parameters)) {
+              vname <- vars[i]      ## name of variable
+              p <- parameters[[i]]  ## formula for variable
+              p[[2]] <- NULL
+              mmat <- model.matrix(p,data=data)     
+              pnames <- paste(vname,colnames(mmat),sep=".")
+              parnames[[vname]] <- pnames ## insert into parameter names
+              vpos0 <- which(pnames0==vname)
+              vposvals <- cumsum(sapply(parnames,length))
+              ## fill out start vectors with zeros or replicates as appropriate
+              if (length(start[[vname]])==1) {
+                  if (length(grep("-1",models[i])>0)) {
+                      start[[vname]] <- rep(start[[vname]],length(pnames))
+                  } else {
+                      start[[vname]] <- c(start[[vname]],rep(0,length(pnames)-1))
+                  }
+              }
+              ## fix: what if parameters are already correctly specified?
+              startpos <- if (vpos0==1) 1 else vposvals[vpos0-1]+1
+              vpos[[vname]] <- startpos:vposvals[vpos0]
+              mmats[[vname]] <- mmat
+          }
       }
-    }
   } else parameters <- vars <- mmats <- vpos <- NULL
-  if (!missing(links)) {
-    stop("parameter link functions not yet implemented")
-    for (i in length(links)) {
+    if (!missing(links)) {
+        stop("parameter link functions not yet implemented")
+        for (i in length(links)) {
+        }
     }
-  }
-  parnames <- unlist(parnames)
+    parnames <- unlist(parnames)
   start <- as.list(unlist(start)) ## collapse/re-expand (WHY?)
   names(start) <- parnames
   arglist <- as.list(RHS[-1]) ## delete function name

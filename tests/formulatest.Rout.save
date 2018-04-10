@@ -1,8 +1,7 @@
 
-R Under development (unstable) (2012-12-14 r61321) -- "Unsuffered Consequences"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
-Platform: i686-pc-linux-gnu (32-bit)
+R Under development (unstable) (2018-03-29 r74490) -- "Unsuffered Consequences"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -103,7 +102,7 @@ Model 3: m4, y~dpois(lambda=ymax/(1+x/xhalf)): ymax~f, xhalf~f
 2      3  173.004 115.7960  1     <2e-16 ***
 3      4  172.415   0.5894  1     0.4427    
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 >   anova(m2,m5,m4)
 Likelihood Ratio Tests
 Model 1: m2, y~dpois(lambda=ymax/(1+x/xhalf))
@@ -114,7 +113,7 @@ Model 3: m4, y~dpois(lambda=ymax/(1+x/xhalf)): ymax~f, xhalf~f
 2      3  177.101 119.8930  1     <2e-16 ***
 3      4  172.415   4.6864  1     0.0304 *  
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 >   AICtab(m2,m3,m4,m5)
    dAIC  df
 m2   0.0 2 
@@ -388,6 +387,23 @@ Coefficients:
 Log-likelihood: -443.06 
 There were 14 warnings (use warnings() to see them)
 > 
+> ## GH 8
+> set.seed(1001)
+> lymax <- c(0,2)
+> lhalf <- 0
+> x <- sort(runif(200))
+> g <- factor(sample(c("a","b"),200,replace=TRUE))
+> y <- rnbinom(200,mu=exp(lymax[g])/(1+x/exp(lhalf)),size=2)
+> d2 <- data.frame(x,g,y)
+> fit3b <- mle2(y~dnbinom(mu=exp(lymax)/(1+x/exp(lhalf)),size=exp(logk)),
++     parameters=list(lhalf~1,lymax~g),data=d2,
++     start=list(lhalf=0,lymax=0,logk=0))
+> coef(fit3b)
+            lhalf lymax.(Intercept)          lymax.gb              logk 
+       -0.4406680         0.2614537         1.7709410         0.5842682 
+> stopifnot(all.equal(names(coef(fit3b)),
++                     c("lhalf", "lymax.(Intercept)", "lymax.gb", "logk")))
+> 
 > proc.time()
    user  system elapsed 
-  2.800   1.028   3.756 
+  1.768   0.148   1.987 

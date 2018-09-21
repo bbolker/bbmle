@@ -237,11 +237,13 @@ mle2 <- function(minuslogl,
         }
     ## also check parnames(minuslogl)?
     if (missing(start) && default.start) start <- formals(minuslogl)
+    call$start <- eval.parent(call$start)
     if (!is.null(fixed) && !is.list(fixed)) {
         if (is.null(names(fixed)) || !is.vector(fixed))
             stop("'fixed' must be a named vector or named list")
         fixed <- as.list(fixed)
     }
+    call$fixed <- eval.parent(call$fixed)
     if (!is.null(data) && !is.list(data)) ##  && !is.environment(data)) 
         stop("'data' must be a list")
     nfix <- names(unlist(namedrop(fixed)))

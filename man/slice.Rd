@@ -85,7 +85,12 @@ slicetrans(params, params2, fun, extend=0.1, nt=401,
 \item{slice1D}{creates one-dimensional slices, by default of all
 parameters of a model}
 \item{slice2D}{creates two-dimensional slices, by default of all pairs
-of parameters in a model}
+  of parameters in a model. In each panel the closed point represents
+  the parameters given (typically the MLEs), while the open point
+  represents the observed minimum value within the 2D slice.
+  If everything has gone according to plan, these points should
+  coincide (at least up to grid precision).
+}
 \item{slicetrans}{creates a slice along a transect between two specified
 points in parameter space (see \code{calcslice} in the \code{emdbook}
 package)}
@@ -100,13 +105,13 @@ d <- data.frame(x,y)
 fit1 <- mle2(y~dpois(lambda=exp(lymax)/(1+x/exp(lhalf))),
    start=list(lymax=0,lhalf=0),
    data=d)
-s1 <- slice(fit1,verbose=FALSE)
-s2 <- slice(fit1,dim=2,verbose=FALSE)
+s1 <- bbmle::slice(fit1,verbose=FALSE)
+s2 <- bbmle::slice(fit1,dim=2,verbose=FALSE)
 require(lattice)
 plot(s1)
 plot(s2)
 ## 'transect' slice, from best-fit values to another point
-st <- slice(fit1,params2=c(5,0.5))
+st <- bbmle::slice(fit1,params2=c(5,0.5))
 plot(st)
 }
 \keyword{misc}

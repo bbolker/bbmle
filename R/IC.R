@@ -80,7 +80,7 @@ ICtab <- function(...,type=c("AIC","BIC","AICc","qAIC","qAICc"),
 print.ICtab <- function(x,...,min.weight=0.001) {
     chtab <- format(do.call("cbind",lapply(x,round,1)))
     rownames(chtab) <- attr(x,"row.names")
-    chtab[,"df"] <- as.character(x$df)
+    chtab[,"df"] <- as.character(round(x$df,1))
     if (!is.null(x$weight))
         chtab[,"weight"] <- format.pval(x$weight,eps=min.weight,
                                         digits=2)

@@ -10,6 +10,11 @@
       \item fixed bug: intercept-only parameters handled wrong (GH #8)
     }
   }
+  \subsection{NEW FEATURES}{
+     \itemize{
+       \item \code{pop_pred_samp}
+     }	
+  }		  
 }
 
 \section{Changes in version 1.0.20 (2017-10-30)}{

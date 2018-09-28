@@ -7,8 +7,11 @@
 #' @param impsamp subsample values (with replacement) based on their weights?
 #' @param ginv use Gill and King generalized-inverse procedure to correct non-positive-definite variance-covariance matrix if necessary?
 #' @param tol tolerance for detecting small eigenvalues
+#'
+#' This function combines several sampling tricks to compute 
 #' 
 #' @references Gill, Jeff, and Gary King. "What to Do When Your Hessian Is Not Invertible: Alternatives to Model Respecification in Nonlinear Estimation." Sociological Methods & Research 33, no. 1 (2004): 54-87.
+#' Lande, Russ and Steinar Engen and Bernt-Erik Saether, Stochastic Population Dynamics in Ecology and Conservation. Oxford University Press, 2003.
 
 pop_pred_samp <- function(object,
                      n=1000,
@@ -45,8 +48,8 @@ pop_pred_samp <- function(object,
     L_wts <- exp(-(L_wts - min(L_wts)))
     L_wts <- L_wts/sum(L_wts)
     eff_samp <- 1/sum(L_wts^2)  ## check ???
-    attr(mv_vals,"eff_samp") <- eff_samp
     mv_vals <- cbind(mv_vals,wts=L_wts)
+    attr(mv_vals,"eff_samp") <- eff_samp
     if (return_wts) return(mv_vals)
     ## do importance sampling
     mv_vals <- mv_vals[sample(seq(nrow(mv_vals)),

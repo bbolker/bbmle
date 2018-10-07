@@ -21,8 +21,15 @@ pop_pred_samp <- function(object,
                      ginv=FALSE,
                      tol = 1e-6) {
     vv <- vcov(object)
-    cc <- coef(object)
-    ## FIXME: not sure how this will interact with fixed parameters?
+    cc <- object@coef ## varying parameters only
+    cc_full <- object@fullcoef ## full parameters
+    fixed_pars <- setdiff(names(object@fullcoef),names(object@coef))
+    res <- matrix(NA,nrow=n,ncol=length(cc_full),
+                  dimnames=list(NULL,names(cc_full)))
+    if (any(is.na(vv)) || any(is.na(cc))) {
+        ## NA vals, probably can't do anything ...
+        return(res)
+    }
     Lfun <- object@minuslogl
     min_eig <- min(eigen(vv,only.values=TRUE)$values)
     if (min_eig<tol) {
@@ -36,27 +43,32 @@ pop_pred_samp <- function(object,
         vv <- crossprod(as.matrix(bdsmatrix::gchol(MASS::ginv(vv))))
     }
     mv_n <- if (impsamp) n_imp else n
-    mv_vals <- MASS::mvrnorm(mv_n,mu=cc,Sigma=vv)
-    if (!(impsamp || return_wts)) return(mv_vals)
+    res[,names(cc)] <- mv_vals <- MASS::mvrnorm(mv_n,mu=cc,Sigma=vv)
+    if (length(fixed_pars)>0) {
+        for (p in fixed_pars) {
+            res[,p] <- object@fullcoef[p]
+        }
+    }
+    if (!(impsamp || return_wts)) return(res)
     ## compute MV sampling probabilities
     mv_wts <- dmvnorm(mv_vals,mu=cc,Sigma=vv,log=TRUE)
     ## compute likelihoods of each sample point
-    L_wts <- apply(mv_vals,1,Lfun)
+    L_wts <- apply(res,1,Lfun)
     ## shift negative log-likelihoods (avoid underflow);
     ## find scaled likelihood
     L_wts <- L_wts - mv_wts ## subtract log samp prob
     L_wts <- exp(-(L_wts - min(L_wts)))
     L_wts <- L_wts/sum(L_wts)
     eff_samp <- 1/sum(L_wts^2)  ## check ???
-    mv_vals <- cbind(mv_vals,wts=L_wts)
-    attr(mv_vals,"eff_samp") <- eff_samp
-    if (return_wts) return(mv_vals)
+    res <- cbind(res,wts=L_wts)
+    attr(res,"eff_samp") <- eff_samp
+    if (return_wts) return(res)
     ## do importance sampling
-    mv_vals <- mv_vals[sample(seq(nrow(mv_vals)),
+    res <- res[sample(seq(nrow(res)),
                               size=n,
                               prob=L_wts,
                               replace=TRUE),]
-    return(mv_vals)
+    return(res)
 }
     
 ## copy (!!) dmvnorm from emdbook to avoid cyclic dependency problems

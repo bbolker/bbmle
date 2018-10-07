@@ -23,24 +23,28 @@ pop_pred_samp <- function(object,
     vv <- vcov(object)
     cc <- object@coef ## varying parameters only
     cc_full <- object@fullcoef ## full parameters
+    Lfun <- object@minuslogl
     fixed_pars <- setdiff(names(object@fullcoef),names(object@coef))
     res <- matrix(NA,nrow=n,ncol=length(cc_full),
                   dimnames=list(NULL,names(cc_full)))
-    if (any(is.na(vv)) || any(is.na(cc))) {
-        ## NA vals, probably can't do anything ...
-        return(res)
+    if (any(is.na(cc))) return(res)
+    bad_vcov <- any(is.na(vv))
+    if (!bad_vcov) {
+        min_eig <- min(eigen(vv,only.values=TRUE)$values)
+    } else {
+        min_eig <- NA
     }
-    Lfun <- object@minuslogl
-    min_eig <- min(eigen(vv,only.values=TRUE)$values)
-    if (min_eig<tol) {
+    if (is.na(min_eig) || any(min_eig<tol)) {
         if (!ginv) {
-            stop("non-positive definitive variance-covariance matrix ",
+            stop("NA or non-positive definitive variance-covariance matrix ",
                  sprintf("(min eig=%f): ",min_eig),
                  "consider ginv=TRUE (and probably impsamp=TRUE)")
         }
         ## use King 1994 to 'posdefify' variance-covariance matrix
         ## (better than e.g. Matrix::nearPD)
-        vv <- crossprod(as.matrix(bdsmatrix::gchol(MASS::ginv(vv))))
+        hh <- object@details$hessian
+        hh[is.na(hh)] <- 0 # !!
+        vv <- crossprod(as.matrix(bdsmatrix::gchol(MASS::ginv(hh))))
     }
     mv_n <- if (impsamp) n_imp else n
     res[,names(cc)] <- mv_vals <- MASS::mvrnorm(mv_n,mu=cc,Sigma=vv)
@@ -52,16 +56,23 @@ pop_pred_samp <- function(object,
     if (!(impsamp || return_wts)) return(res)
     ## compute MV sampling probabilities
     mv_wts <- dmvnorm(mv_vals,mu=cc,Sigma=vv,log=TRUE)
+    ## 
+    if (all(is.na(mv_wts)) && length(mv_wts)==1) {
+        ## work around emdbook bug
+        mv_wts <- rep(NA,length(mv_vals))
+        warning("can't compute MV sampling probabilities")
+    }
     ## compute likelihoods of each sample point
     L_wts <- apply(res,1,Lfun)
     ## shift negative log-likelihoods (avoid underflow);
     ## find scaled likelihood
     L_wts <- L_wts - mv_wts ## subtract log samp prob
-    L_wts <- exp(-(L_wts - min(L_wts)))
-    L_wts <- L_wts/sum(L_wts)
-    eff_samp <- 1/sum(L_wts^2)  ## check ???
+    L_wts <- exp(-(L_wts - min(L_wts,na.rm=TRUE)))
+    L_wts <- L_wts/sum(L_wts,na.rm=TRUE)
+    eff_samp <- 1/sum(L_wts^2,na.rm=TRUE)  ## check ???
     res <- cbind(res,wts=L_wts)
     attr(res,"eff_samp") <- eff_samp
+    ## FIXME: warn if eff_samp is low?
     if (return_wts) return(res)
     ## do importance sampling
     res <- res[sample(seq(nrow(res)),
@@ -90,15 +101,13 @@ dmvnorm <- function (x, mu, Sigma, log = FALSE, tol = 1e-06) {
     eS <- eigen(Sigma, symmetric = TRUE) 
     ev <- eS$values
     if (!all(ev >= -tol * abs(ev[1]))) 
-        stop("Sigma is not positive definite")
+        warning("Sigma is not positive definite, trying anyway")
     z = t(x - mu)
-    logdetS = try(determinant(Sigma, logarithm = TRUE)$modulus)
+    logdetS = try(determinant(Sigma, logarithm = TRUE)$modulus,
+                  silent=TRUE)
+    if (inherits(logdetS,"try-error")) return(rep(NA,nrow(x)))
     attributes(logdetS) <- NULL
-    iS = try(solve(Sigma))
-    if (class(iS) == "try-error" || class(logdetS) == "try-error") {
-        warning("difficulty inverting/taking determinant of Var-Cov matrix")
-        return(NA)
-    }
+    iS = MASS::ginv(Sigma)
     ssq = diag(t(z) %*% iS %*% z)
     loglik = -(n * (log(2*pi)) +  logdetS + ssq)/2
     if (log) loglik else exp(loglik)

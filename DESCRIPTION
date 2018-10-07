@@ -1,7 +1,7 @@
 Package: bbmle
 Title: Tools for General Maximum Likelihood Estimation
 Description: Methods and functions for fitting maximum likelihood models in R.
-Version: 1.0.21
+Version: 1.0.21.9001
 Authors@R: c(person("Ben","Bolker",email="bolker@mcmaster.ca",role=c("aut","cre")),
 	   person("R Development Core Team",role=c("aut")))
 Depends:

@@ -77,3 +77,8 @@ sgamma <- function(shape,rate=1,scale=1/rate) {
          mode=NA,
          variance=shape/rate^2)
 }
+
+dnorm_n <- function(x,mean,log=FALSE) {
+  ssq <- sum((x-mean)^2)
+  stats::dnorm(x,mean,sd=sqrt(ssq/length(x)),log=log)
+}

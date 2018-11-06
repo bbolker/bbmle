@@ -5,7 +5,7 @@
 #' @param n_imp number of total samples from which to draw, if doing importance sampling
 #' @param return_wts return a column giving the weights of the samples, for use in weighted summaries?
 #' @param impsamp subsample values (with replacement) based on their weights?
-#' @param ginv use Gill and King generalized-inverse procedure to correct non-positive-definite variance-covariance matrix if necessary?
+#' @param PDify use Gill and King generalized-inverse procedure to correct non-positive-definite variance-covariance matrix if necessary?
 #' @param tol tolerance for detecting small eigenvalues
 #'
 #' This function combines several sampling tricks to compute 
@@ -18,8 +18,10 @@ pop_pred_samp <- function(object,
                      n_imp=n*10,
                      return_wts=FALSE,
                      impsamp=FALSE,
-                     ginv=FALSE,
+                     PDify=FALSE,
+                     PDmethod=NULL,
                      tol = 1e-6) {
+    min_eval <- function(x) min(eigen(x,only.values=TRUE)$values)
     vv <- vcov(object)
     cc <- object@coef ## varying parameters only
     cc_full <- object@fullcoef ## full parameters
@@ -30,21 +32,35 @@ pop_pred_samp <- function(object,
     if (any(is.na(cc))) return(res)
     bad_vcov <- any(is.na(vv))
     if (!bad_vcov) {
-        min_eig <- min(eigen(vv,only.values=TRUE)$values)
+        min_eig <- min_eval(vv)
     } else {
         min_eig <- NA
     }
     if (is.na(min_eig) || any(min_eig<tol)) {
-        if (!ginv) {
+        if (!PDify) {
             stop("NA or non-positive definitive variance-covariance matrix ",
                  sprintf("(min eig=%f): ",min_eig),
-                 "consider ginv=TRUE (and probably impsamp=TRUE)")
+                 "consider PDify=TRUE (and probably impsamp=TRUE)")
         }
         ## use King 1994 to 'posdefify' variance-covariance matrix
         ## (better than e.g. Matrix::nearPD)
         hh <- object@details$hessian
-        hh[is.na(hh)] <- 0 # !!
-        vv <- crossprod(as.matrix(bdsmatrix::gchol(MASS::ginv(hh))))
+        if (any(is.na(hh))) {
+            warning("NA values in Hessian set to zero: check results *very* carefully!") 
+            hh[is.na(hh)] <- 0 # !! questionable
+        }
+        if ((is.null(PDmethod) && min_eval(hh)>(-tol)) ||
+            identical(PDmethod,"King")) {
+            ## semi definite: use King et al method
+            ## (we may need this when semidefinite, because
+            ##  we couldn't invert H in the first place ... nearPD
+            ##  wants to take a non-pos-def matrix and PDify it.
+            ##  (perhaps we could PDify the Hessian and then invert it ???
+            vv <- crossprod(as.matrix(bdsmatrix::gchol(MASS::ginv(hh)),
+                                      ones = FALSE))
+        } else {
+            vv <- as.matrix(Matrix::nearPD(vv)$mat)
+        }
     }
     mv_n <- if (impsamp) n_imp else n
     res[,names(cc)] <- mv_vals <- MASS::mvrnorm(mv_n,mu=cc,Sigma=vv)

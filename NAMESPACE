@@ -14,9 +14,11 @@ importClassesFrom(stats4,mle)
 importFrom(stats4,coef,confint,logLik,BIC,summary,profile,vcov,AIC, update, plot)
 importFrom(stats,
            anova,deviance,residuals,
-           simulate,predict,formula,napredict,na.omit,na.exclude)
+           simulate,predict,formula,napredict,na.omit,na.exclude,
+           dnorm)
 importFrom(methods,setMethod,is)
 importFrom(lattice,xyplot,splom,diag.panel.splom,panel.abline,panel.number,panel.points,panel.xyplot)  ## for slice methods
+importFrom(Matrix,nearPD)
 importFrom(numDeriv,hessian,grad,jacobian)
 importFrom(grDevices, dev.interactive)
 importFrom(graphics, abline, lines, par, points, text)

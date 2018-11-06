@@ -13,7 +13,8 @@ Imports:
     lattice,
     MASS,
     methods,
-    bdsmatrix
+    bdsmatrix,
+    Matrix
 Suggests:
     emdbook,
     rms,

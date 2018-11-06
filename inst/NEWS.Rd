@@ -12,7 +12,11 @@
   }
   \subsection{NEW FEATURES}{
      \itemize{
-       \item \code{pop_pred_samp}
+       \item \code{pop_pred_samp} to compute population prediction
+       samples, tweaking non-pos-def covariance matrices and using
+       importance samples if necessary/specified
+       \item added \code{dnorm_n} function for Normal densities
+       with the standard deviation parameter profiled out
      }	
   }		  
 }

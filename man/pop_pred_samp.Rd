@@ -2,10 +2,10 @@
 % Please edit documentation in R/impsamp.R
 \name{pop_pred_samp}
 \alias{pop_pred_samp}
-\title{generate population prediction sample from parameters}
+\title{generate population prediction sample from parameters (EXPERIMENTAL)}
 \usage{
 pop_pred_samp(object, n = 1000, n_imp = n * 10, return_wts = FALSE,
-  impsamp = FALSE, ginv = FALSE, tol = 1e-06)
+  impsamp = FALSE, PDify = FALSE, PDmethod=NULL, tol = 1e-06)
 }
 \arguments{
 \item{object}{a fitted \code{mle2} object}
@@ -18,10 +18,15 @@ pop_pred_samp(object, n = 1000, n_imp = n * 10, return_wts = FALSE,
 
 \item{impsamp}{subsample values (with replacement) based on their weights?}
 
-\item{ginv}{use Gill and King generalized-inverse procedure to correct non-positive-definite variance-covariance matrix if necessary?}
-
+\item{PDify}{try to correct non-positive-definite matrix if necessary? (EXPERIMENTAL)}
+\item{PDmethod}{method to use for correcting non-pos-def matrices: the
+  default NULL will use the King et al generalized inverse/Cholesky
+  approach for semidefinite matrices and \code{Matrix::nearPD} for
+  matrices with definitely negative eigenvalues}
 \item{tol}{tolerance for detecting small eigenvalues}
 }
+\note{Turn on non-positive-definite corrections (i.e. set
+  \code{PDify=TRUE}) with caution!}
 \description{
 generate population prediction sample from parameters
 }

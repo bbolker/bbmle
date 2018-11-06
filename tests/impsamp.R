@@ -13,7 +13,7 @@ fit3 <- mle2(y~dnbinom(mu=(exp(lymax)/(1+x/exp(lhalf)))^d,size=exp(logk)),
     data=dd,
     fixed=list(d=2))
 
-pp <- pop_pred_samp(fit3,ginv=TRUE)
+pp <- pop_pred_samp(fit3,PDify=TRUE)
 stopifnot(
     !any(is.na(pp)),
     identical(colnames(pp),

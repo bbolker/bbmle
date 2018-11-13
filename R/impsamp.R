@@ -7,6 +7,7 @@
 #' @param impsamp subsample values (with replacement) based on their weights?
 #' @param PDify use Gill and King generalized-inverse procedure to correct non-positive-definite variance-covariance matrix if necessary?
 #' @param tol tolerance for detecting small eigenvalues
+#' @param fix_params parameters to fix (in addition to parameters that were fixed during estimation)
 #'
 #' This function combines several sampling tricks to compute 
 #' 
@@ -20,13 +21,22 @@ pop_pred_samp <- function(object,
                      impsamp=FALSE,
                      PDify=FALSE,
                      PDmethod=NULL,
-                     tol = 1e-6) {
+                     tol = 1e-6,
+                     fix_params=NULL) {
+    
     min_eval <- function(x) min(eigen(x,only.values=TRUE)$values)
-    vv <- vcov(object)
-    cc <- object@coef ## varying parameters only
+
+    ## extract var-cov,
     cc_full <- object@fullcoef ## full parameters
+    cc <- object@coef ## varying parameters only
+    keep_params <- !names(cc) %in% fix_params
+
+    cc <- cc[keep_params]
+    vv <- vcov(object)
+    vv <- vv[keep_params,keep_params]
+
     Lfun <- object@minuslogl
-    fixed_pars <- setdiff(names(object@fullcoef),names(object@coef))
+    fixed_pars <- setdiff(names(object@fullcoef),names(cc))
     res <- matrix(NA,nrow=n,ncol=length(cc_full),
                   dimnames=list(NULL,names(cc_full)))
     if (any(is.na(cc))) return(res)

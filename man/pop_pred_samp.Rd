@@ -5,7 +5,8 @@
 \title{generate population prediction sample from parameters (EXPERIMENTAL)}
 \usage{
 pop_pred_samp(object, n = 1000, n_imp = n * 10, return_wts = FALSE,
-  impsamp = FALSE, PDify = FALSE, PDmethod=NULL, tol = 1e-06)
+  impsamp = FALSE, PDify = FALSE, PDmethod=NULL, tol = 1e-06,
+  fix_params = NULL)
 }
 \arguments{
 \item{object}{a fitted \code{mle2} object}
@@ -24,6 +25,7 @@ pop_pred_samp(object, n = 1000, n_imp = n * 10, return_wts = FALSE,
   approach for semidefinite matrices and \code{Matrix::nearPD} for
   matrices with definitely negative eigenvalues}
 \item{tol}{tolerance for detecting small eigenvalues}
+\item{fix_params}{parameters to fix (in addition to parameters that were fixed during estimation)}
 }
 \note{Turn on non-positive-definite corrections (i.e. set
   \code{PDify=TRUE}) with caution!}

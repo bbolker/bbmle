@@ -18,3 +18,7 @@ stopifnot(
     !any(is.na(pp)),
     identical(colnames(pp),
               c("lymax.(Intercept)", "lymax.gb", "lhalf", "logk", "d")))
+
+## fix parameters instead of dealing with negative variance
+pp2 <- pop_pred_samp(fit3,fix_param="lhalf")
+stopifnot(length(unique(pp2[,"lhalf"]))==1)

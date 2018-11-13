@@ -54,7 +54,7 @@ pop_pred_samp <- function(object,
         }
         ## use King 1994 to 'posdefify' variance-covariance matrix
         ## (better than e.g. Matrix::nearPD)
-        hh <- object@details$hessian
+        hh <- object@details$hessian[keep_params,keep_params]
         if (any(is.na(hh))) {
             warning("NA values in Hessian set to zero: check results *very* carefully!") 
             hh[is.na(hh)] <- 0 # !! questionable

@@ -88,12 +88,12 @@ pop_pred_samp <- function(object,
         mv_wts <- rep(NA,length(mv_vals))
         warning("can't compute MV sampling probabilities")
     }
-    ## compute likelihoods of each sample point
-    L_wts <- apply(res,1,Lfun)
+    ## compute **log**-likelihoods of each sample point
+    L_wts <- -1*apply(res,1,Lfun)
     ## shift negative log-likelihoods (avoid underflow);
     ## find scaled likelihood
     L_wts <- L_wts - mv_wts ## subtract log samp prob
-    L_wts <- exp(-(L_wts - min(L_wts,na.rm=TRUE)))
+    L_wts <- exp(L_wts + min(L_wts,na.rm=TRUE))
     L_wts <- L_wts/sum(L_wts,na.rm=TRUE)
     eff_samp <- 1/sum(L_wts^2,na.rm=TRUE)  ## check ???
     res <- cbind(res,wts=L_wts)

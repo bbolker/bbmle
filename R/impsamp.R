@@ -24,7 +24,15 @@ pop_pred_samp <- function(object,
                      tol = 1e-6,
                      fix_params=NULL) {
     
-    min_eval <- function(x) min(eigen(x,only.values=TRUE)$values)
+    min_eval <- function(x) {
+        ev <- eigen(x,only.values=TRUE)$values
+        if (is.complex(ev)) {
+            print(x)
+            print(ev)
+            stop("covariance matrix with complex eigenvalues (!)")
+        }
+        min(ev)
+    }
 
     ## extract var-cov,
     cc_full <- object@fullcoef ## full parameters

@@ -101,7 +101,11 @@ pop_pred_samp <- function(object,
     ## shift negative log-likelihoods (avoid underflow);
     ## find scaled likelihood
     L_wts <- L_wts - mv_wts ## subtract log samp prob
-    L_wts <- exp(L_wts - min(L_wts,na.rm=TRUE))
+
+	 ## Hacking; fix if works
+    ## L_wts <- L_wts - min(L_wts,na.rm=TRUE)
+    L_wts <- exp(L_wts)
+
     L_wts <- L_wts/sum(L_wts,na.rm=TRUE)
     eff_samp <- 1/sum(L_wts^2,na.rm=TRUE)  ## check ???
     res <- cbind(res,wts=L_wts)

@@ -29,9 +29,9 @@ pop_pred_samp <- function(object,
         if (is.complex(ev)) {
             print(x)
             print(ev)
-            stop("covariance matrix with complex eigenvalues (!)")
+            warning("covariance matrix with complex eigenvalues (!)")
         }
-        min(ev)
+        min(Re(ev))
     }
 
     ## extract var-cov,

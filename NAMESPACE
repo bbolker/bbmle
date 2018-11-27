@@ -30,6 +30,7 @@ importFrom(stats, approx, approxfun, as.formula, constrOptim,
            spline, uniroot, update.formula)
 importFrom(MASS, mvrnorm, ginv)
 importFrom(bdsmatrix, gchol)
+importFrom(mvtnorm,dmvnorm)
 S3method(as.data.frame,profile.mle2)
 S3method(print,ICtab)
 S3method(slice,mle2)

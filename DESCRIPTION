@@ -14,7 +14,8 @@ Imports:
     MASS,
     methods,
     bdsmatrix,
-    Matrix
+    Matrix,
+    mvtnorm
 Suggests:
     emdbook,
     rms,

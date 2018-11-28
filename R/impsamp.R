@@ -94,7 +94,7 @@ pop_pred_samp <- function(object,
     ## draw MVN samples
     res[,names(cc)] <- mv_vals <- switch(rmvnorm_method,
                                          mvtnorm=mvtnorm::rmvnorm(mv_n, mean=cc, sigma=vv),
-                                         MASS=MASS::mvrnorm(mv_n, mu=cc, Sigma=vv)
+                                         MASS=MASS::mvrnorm(mv_n, mu=cc, Sigma=vv))
     ## fill in fixed parameters as necessary
     if (length(fixed_pars)>0) {
         for (p in fixed_pars) {

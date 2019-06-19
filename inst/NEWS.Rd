@@ -7,14 +7,15 @@
 \section{Changes in version 1.0.21.9002}{
   \subsection{BUG FIXES}{
     \itemize{
-      \item fixed bug: intercept-only parameters handled wrong (GH #8)
+      \item intercept-only parameters were handled wrong (GH #8)
     }
   }
   \subsection{NEW FEATURES}{
      \itemize{
        \item \code{pop_pred_samp} to compute population prediction
        samples, tweaking non-pos-def covariance matrices and using
-       importance samples if necessary/specified
+       importance samples if necessary/specified. \strong{This is
+	 still experimental/in flux!}
        \item added \code{dnorm_n} function for Normal densities
        with the standard deviation parameter profiled out
      }	

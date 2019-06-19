@@ -6,10 +6,13 @@
 #' @param return_wts return a column giving the weights of the samples, for use in weighted summaries?
 #' @param impsamp subsample values (with replacement) based on their weights?
 #' @param PDify use Gill and King generalized-inverse procedure to correct non-positive-definite variance-covariance matrix if necessary?
+#' @param PDmethod method for fixing non-positive-definite covariance matrices
+#' @param rmvnorm_method package to use for generating MVN samples
 #' @param tol tolerance for detecting small eigenvalues
 #' @param fix_params parameters to fix (in addition to parameters that were fixed during estimation)
+#' @param return_all return a matrix including all values, and weights (rather than taking a sample)
 #'
-#' This function combines several sampling tricks to compute 
+#' This [EXPERIMENTAL] function combines several sampling tricks to compute a version of an importance sample (based on flat priors) for the parameters, 
 #' 
 #' @references Gill, Jeff, and Gary King. "What to Do When Your Hessian Is Not Invertible: Alternatives to Model Respecification in Nonlinear Estimation." Sociological Methods & Research 33, no. 1 (2004): 54-87.
 #' Lande, Russ and Steinar Engen and Bernt-Erik Saether, Stochastic Population Dynamics in Ecology and Conservation. Oxford University Press, 2003.

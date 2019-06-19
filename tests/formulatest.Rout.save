@@ -1,6 +1,6 @@
 
-R Under development (unstable) (2018-03-29 r74490) -- "Unsuffered Consequences"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R Under development (unstable) (2019-06-19 r76722) -- "Unsuffered Consequences"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -19,7 +19,6 @@ Type 'q()' to quit R.
 
 > library(bbmle)
 Loading required package: stats4
-> 
 > set.seed(1001)
 > 
 > ## test 1
@@ -400,10 +399,10 @@ There were 14 warnings (use warnings() to see them)
 +     start=list(lhalf=0,lymax=0,logk=0))
 > coef(fit3b)
             lhalf lymax.(Intercept)          lymax.gb              logk 
-       -0.4406680         0.2614537         1.7709410         0.5842682 
+      -0.03968142       -0.10104397        2.12733072        0.40478459 
 > stopifnot(all.equal(names(coef(fit3b)),
 +                     c("lhalf", "lymax.(Intercept)", "lymax.gb", "logk")))
 > 
 > proc.time()
    user  system elapsed 
-  1.768   0.148   1.987 
+  2.488   0.132   2.757 

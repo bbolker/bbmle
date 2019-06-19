@@ -2,10 +2,11 @@
 % Please edit documentation in R/impsamp.R
 \name{pop_pred_samp}
 \alias{pop_pred_samp}
-\title{generate population prediction sample from parameters (EXPERIMENTAL)}
+\title{generate population prediction sample from parameters}
 \usage{
 pop_pred_samp(object, n = 1000, n_imp = n * 10, return_wts = FALSE,
-  impsamp = FALSE, PDify = FALSE, PDmethod=NULL, tol = 1e-06,
+  impsamp = FALSE, PDify = FALSE, PDmethod = NULL, tol = 1e-06,
+  return_all = FALSE, rmvnorm_method = c("mvtnorm", "MASS"),
   fix_params = NULL)
 }
 \arguments{
@@ -19,19 +20,24 @@ pop_pred_samp(object, n = 1000, n_imp = n * 10, return_wts = FALSE,
 
 \item{impsamp}{subsample values (with replacement) based on their weights?}
 
-\item{PDify}{try to correct non-positive-definite matrix if necessary? (EXPERIMENTAL)}
-\item{PDmethod}{method to use for correcting non-pos-def matrices: the
-  default NULL will use the King et al generalized inverse/Cholesky
-  approach for semidefinite matrices and \code{Matrix::nearPD} for
-  matrices with definitely negative eigenvalues}
+\item{PDify}{use Gill and King generalized-inverse procedure to correct non-positive-definite variance-covariance matrix if necessary?}
+
+\item{PDmethod}{method for fixing non-positive-definite covariance matrices}
+
 \item{tol}{tolerance for detecting small eigenvalues}
+
+\item{return_all}{return a matrix including all values, and weights (rather than taking a sample)
+
+This [EXPERIMENTAL] function combines several sampling tricks to compute a version of an importance sample (based on flat priors) for the parameters,}
+
+\item{rmvnorm_method}{package to use for generating MVN samples}
+
 \item{fix_params}{parameters to fix (in addition to parameters that were fixed during estimation)}
 }
-\note{Turn on non-positive-definite corrections (i.e. set
-  \code{PDify=TRUE}) with caution!}
 \description{
 generate population prediction sample from parameters
 }
 \references{
 Gill, Jeff, and Gary King. "What to Do When Your Hessian Is Not Invertible: Alternatives to Model Respecification in Nonlinear Estimation." Sociological Methods & Research 33, no. 1 (2004): 54-87.
+Lande, Russ and Steinar Engen and Bernt-Erik Saether, Stochastic Population Dynamics in Ecology and Conservation. Oxford University Press, 2003.
 }

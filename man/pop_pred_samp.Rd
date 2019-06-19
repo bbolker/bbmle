@@ -26,16 +26,14 @@ pop_pred_samp(object, n = 1000, n_imp = n * 10, return_wts = FALSE,
 
 \item{tol}{tolerance for detecting small eigenvalues}
 
-\item{return_all}{return a matrix including all values, and weights (rather than taking a sample)
-
-This [EXPERIMENTAL] function combines several sampling tricks to compute a version of an importance sample (based on flat priors) for the parameters,}
+\item{return_all}{return a matrix including all values, and weights (rather than taking a sample)}
 
 \item{rmvnorm_method}{package to use for generating MVN samples}
 
 \item{fix_params}{parameters to fix (in addition to parameters that were fixed during estimation)}
 }
 \description{
-generate population prediction sample from parameters
+This [EXPERIMENTAL] function combines several sampling tricks to compute a version of an importance sample (based on flat priors) for the parameters.
 }
 \references{
 Gill, Jeff, and Gary King. "What to Do When Your Hessian Is Not Invertible: Alternatives to Model Respecification in Nonlinear Estimation." Sociological Methods & Research 33, no. 1 (2004): 54-87.

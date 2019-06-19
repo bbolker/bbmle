@@ -1,5 +1,7 @@
 #' generate population prediction sample from parameters
-#'
+#' 
+#' This [EXPERIMENTAL] function combines several sampling tricks to compute a version of an importance sample (based on flat priors) for the parameters. 
+#' 
 #' @param object a fitted \code{mle2} object
 #' @param n number of samples to return
 #' @param n_imp number of total samples from which to draw, if doing importance sampling
@@ -11,9 +13,7 @@
 #' @param tol tolerance for detecting small eigenvalues
 #' @param fix_params parameters to fix (in addition to parameters that were fixed during estimation)
 #' @param return_all return a matrix including all values, and weights (rather than taking a sample)
-#'
-#' This [EXPERIMENTAL] function combines several sampling tricks to compute a version of an importance sample (based on flat priors) for the parameters, 
-#' 
+#' @export
 #' @references Gill, Jeff, and Gary King. "What to Do When Your Hessian Is Not Invertible: Alternatives to Model Respecification in Nonlinear Estimation." Sociological Methods & Research 33, no. 1 (2004): 54-87.
 #' Lande, Russ and Steinar Engen and Bernt-Erik Saether, Stochastic Population Dynamics in Ecology and Conservation. Oxford University Press, 2003.
 

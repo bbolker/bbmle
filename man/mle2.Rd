@@ -102,7 +102,7 @@ calc_mle2_function(formula,parameters, links, start,
     will be given starting values of zero (unless a no-intercept
     formula with \code{-1} is specified, in which case all the
     starting values for that parameter will be set equal)
-    \item [to be implemented!] as an exhaustive (flat) list
+    \item (to be implemented!) as an exhaustive (flat) list
     of starting values (in the order given by \code{model.matrix})
   }
   

@@ -18,8 +18,10 @@
 	 still experimental/in flux!}
        \item added \code{dnorm_n} function for Normal densities
        with the standard deviation parameter profiled out
+       \item add \code{slnorm} function for log-Normal densities
+       (median and mean only for now)
        \item IC tables now have an \code{as.data.frame} method (from
-  @iago-pssjd on GitHub)
+       @iago-pssjd on GitHub)
      }	
   }		  
 }

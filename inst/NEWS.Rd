@@ -14,9 +14,9 @@
   \subsection{NEW FEATURES}{
      \itemize{
        \item \code{pop_pred_samp} to compute population prediction
-       samples, tweaking non-pos-def covariance matrices and using
+       samples, tweaking non-positive-definite covariance matrices and using
        importance samples if necessary/specified. \strong{This is
-	 still experimental/in flux!}
+	 still VERY experimental/in flux!}
        \item added \code{dnorm_n} function for Normal densities
        with the standard deviation parameter profiled out
        \item add \code{slnorm} function for log-Normal densities
@@ -24,7 +24,13 @@
        \item IC tables now have an \code{as.data.frame} method (from
        @iago-pssjd on GitHub)
      }
-  }		  
+   }
+   \subsection{USER-VISIBLE CHANGES}{
+     \itemize{
+       \item the evaluated
+       \code{start} and \code{fixed} components of the call are now stored
+       in the \code{call} component (Daniel B. Stouffer)
+   }
 }
 
 \section{Changes in version 1.0.20 (2017-10-30)}{

@@ -4,10 +4,11 @@
 \title{bbmle News}
 \encoding{UTF-8}
 
-\section{Changes in version 1.0.21.9002}{
+\section{Changes in version 1.0.22}{
   \subsection{BUG FIXES}{
     \itemize{
       \item intercept-only parameters were handled wrong (GH #8)
+      \item fix error-handling (class vs. inherits) for R 4.0 compatibility
     }
   }
   \subsection{NEW FEATURES}{
@@ -22,7 +23,7 @@
        (median and mean only for now)
        \item IC tables now have an \code{as.data.frame} method (from
        @iago-pssjd on GitHub)
-     }	
+     }
   }		  
 }
 

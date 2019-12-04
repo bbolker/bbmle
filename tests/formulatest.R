@@ -1,5 +1,4 @@
 library(bbmle)
-
 set.seed(1001)
 
 ## test 1

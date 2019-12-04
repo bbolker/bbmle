@@ -12,10 +12,10 @@ mle2.options(...)
     or a list of values to set}
 }
 \details{
-  \itemize{
+  \describe{
     \item{optim.method}{name of optimization method (see
       \code{\link{optim}} for choices)}
-    \item{confint}{name of confidence-interval: choices
+    \item{confint}{name of confidence interval method: choices
       are "spline", "uniroot", "hessian" corresponding
       to spline inversion, attempt to find best answer via uniroot,
       information-matrix approximation}

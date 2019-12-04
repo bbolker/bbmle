@@ -1,7 +1,7 @@
 Package: bbmle
 Title: Tools for General Maximum Likelihood Estimation
 Description: Methods and functions for fitting maximum likelihood models in R.
-Version: 1.0.21.9004
+Version: 1.0.22
 Authors@R: c(person("Ben","Bolker",email="bolker@mcmaster.ca",role=c("aut","cre")),
 	   person("R Development Core Team",role=c("aut")))
 Depends:
@@ -14,7 +14,8 @@ Imports:
     MASS,
     methods,
     bdsmatrix,
-    Matrix
+    Matrix,
+    mvtnorm
 Suggests:
     emdbook,
     rms,
@@ -43,4 +44,5 @@ Collate:
     'IC.R'
     'slice.R'
     'impsamp.R'
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
+Encoding: UTF-8

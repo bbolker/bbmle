@@ -1,8 +1,7 @@
 
-R Under development (unstable) (2012-12-14 r61321) -- "Unsuffered Consequences"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
-Platform: i686-pc-linux-gnu (32-bit)
+R Under development (unstable) (2019-06-19 r76722) -- "Unsuffered Consequences"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -90,7 +89,7 @@ Coefficients:
 
 Log-likelihood: -10188 
 Warning message:
-In optim(par = 0.01, fn = function (p)  :
+In optim(par = c(rate = 0.01), fn = function (p)  :
   one-dimensional optimization by Nelder-Mead is unreliable:
 use "Brent" or optimize() directly
 > vcov(m0)
@@ -127,4 +126,4 @@ rate 1.41e-11
 > 
 > proc.time()
    user  system elapsed 
-  0.732   1.348   1.980 
+  1.528   0.100   1.762 

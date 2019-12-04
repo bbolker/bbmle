@@ -87,6 +87,11 @@ print.ICtab <- function(x,...,min.weight=0.001) {
     print(chtab,quote=FALSE)
 }
 
+as.data.frame.ICtab <- function(x, row.names = NULL, optional = FALSE, ...){
+    attr(x,"class") <- "data.frame"
+    as.data.frame(x, row.names = row.names, optional = optional)
+}
+
 AICtab <- function(...,mnames) {
     ## fancy footwork to preserve model names
     if (missing(mnames)) mnames <- get.mnames(match.call())

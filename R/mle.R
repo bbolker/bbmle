@@ -65,7 +65,7 @@ calc_mle2_function <- function(formula,
             for (i in seq(along=parameters)) {
                 vname <- vars[i]      ## name of variable
                 p <- parameters[[i]]  ## formula for variable
-                p[[2]] <- NULL
+                p[[2]] <- NULL        ## RHS only
                 mmat <- model.matrix(p,data=data)     
                 pnames <- paste(vname,colnames(mmat),sep=".")
                 parnames[[vname]] <- pnames ## insert into parameter names
@@ -76,7 +76,8 @@ calc_mle2_function <- function(formula,
                     if (length(grep("-1",models[i])>0)) {
                         start[[vname]] <- rep(start[[vname]],length(pnames))
                     } else {
-                        start[[vname]] <- c(start[[vname]],rep(0,length(pnames)-1))
+                        start[[vname]] <- c(start[[vname]],
+                                            rep(0,length(pnames)-1))
                     }
                 }
                 ## fix: what if parameters are already correctly specified?
@@ -530,7 +531,7 @@ mle2 <- function(minuslogl,
             } else {
                 tmphess <- try(solve(oout$hessian,silent=TRUE))
             }
-            if (class(tmphess)=="try-error") {
+            if (inherits(tmphess,"try-error")) {
                 tvcov <- matrix(NA,length(coef),length(coef))
                 warning("couldn't invert Hessian")
             } else tvcov <- tmphess

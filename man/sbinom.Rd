@@ -5,6 +5,7 @@
 \alias{snorm}
 \alias{sbeta}
 \alias{sbetabinom}
+\alias{slnorm}
 \title{Abstract definitions of distributions}
 \description{
   Functions returning values for summary statistics
@@ -17,6 +18,7 @@ sbinom(size, prob)
 snbinom(size, prob, mu)
 snorm(mean, sd)
 spois(lambda)
+slnorm(meanlog, sdlog)
 }
 \arguments{
   \item{prob}{probability as defined for \code{\link{dbinom}},
@@ -34,6 +36,9 @@ spois(lambda)
   \item{lambda}{rate parameter as defined for \code{\link{dpois}}}
   \item{theta}{overdispersion parameter for beta-binomial
     (see \code{dbetabinom} in the \code{emdbook} package)}
+  \item{meanlog}{as defined for \code{\link{dlnorm}}}
+  \item{sdlog}{as defined for \code{\link{dlnorm}}}
+
 }
 \value{
   \item{title}{name of the distribution}

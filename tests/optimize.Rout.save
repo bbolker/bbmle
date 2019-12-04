@@ -1,8 +1,7 @@
 
-R Under development (unstable) (2012-07-27 r60013) -- "Unsuffered Consequences"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
-Platform: i686-pc-linux-gnu (32-bit)
+R Under development (unstable) (2019-06-19 r76722) -- "Unsuffered Consequences"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -28,6 +27,7 @@ Type 'q()' to quit R.
 > 
 > 
 > library(bbmle)
+Loading required package: stats4
 > 
 > lb <- 6
 > ## first try with L-BFGS-B and bounds
@@ -58,10 +58,12 @@ x
    2.5 %   97.5 % 
       NA 6.668954 
 > plot(p2,show.points=TRUE)
-Warning message:
-In .local(x, ...) :
+Warning messages:
+1: In .local(x, ...) :
   non-monotonic profile: reverting to linear interpolation.  Consider setting std.err manually
+2: In regularize.values(x, y, ties, missing(ties), na.rm = na.rm) :
+  collapsing to unique 'x' values
 > 
 > proc.time()
    user  system elapsed 
-  0.960   1.064   1.875 
+  1.628   0.096   1.803 

@@ -82,3 +82,9 @@ dnorm_n <- function(x,mean,log=FALSE) {
   ssq <- sum((x-mean)^2)
   stats::dnorm(x,mean,sd=sqrt(ssq/length(x)),log=log)
 }
+
+slnorm <- function(meanlog, sdlog) {
+    list(title="Log-normal",
+         median=exp(meanlog),
+         mean=exp(meanlog+sdlog^2/2))
+}

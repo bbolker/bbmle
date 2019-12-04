@@ -1,7 +1,7 @@
 
-R Under development (unstable) (2013-08-18 r63609) -- "Unsuffered Consequences"
-Copyright (C) 2013 The R Foundation for Statistical Computing
-Platform: i686-pc-linux-gnu (32-bit)
+R Under development (unstable) (2019-06-19 r76722) -- "Unsuffered Consequences"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -44,8 +44,9 @@ Log-likelihood: -28.6
 > m2
 
 Call:
-mle2(minuslogl = y ~ dpois(lambda = ymax/(1 + x/xhalf)), start = list(ymax = 1, 
-    xhalf = 1), data = ..1, lower = -Inf, upper = Inf, control = list())
+mle2(minuslogl = y ~ dpois(lambda = ymax/(1 + x/xhalf)), start = list(
+    ymax = 1, xhalf = 1), data = ..1, lower = -Inf, upper = Inf, 
+    control = list())
 
 Coefficients:
  ymax xhalf 
@@ -69,4 +70,4 @@ Log-likelihood: -42.7
 > 
 > proc.time()
    user  system elapsed 
-  0.576   0.832   2.785 
+  1.524   0.112   1.728 

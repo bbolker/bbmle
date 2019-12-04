@@ -365,7 +365,7 @@ setMethod("plot", signature(x="profile.mle2", y="missing"),
             avals <- rbind(avals,as.data.frame(predict(sp)))
             avals <- avals[order(avals$x),]
             bsp <- try(splines::backSpline(sp),silent=TRUE)
-            bsp.OK <- (class(bsp)[1]!="try-error")
+            bsp.OK <- !inherits(class(bsp),"try-error")
             if (bsp.OK) {
                 predback <- function(y) { predict(bsp,y)$y }
             } else { ## backspline failed
@@ -377,7 +377,7 @@ setMethod("plot", signature(x="profile.mle2", y="missing"),
                         t1 <- try(uniroot(function(z) {
                             predict(sp,z)$y-z1
                         }, range(obj[[i]]$par.vals[,nm[i]])),silent=TRUE)
-                        if (class(t1)[1]=="try-error") NA else t1$root
+                        if (inherits(t1,"try-error")) NA else t1$root
                     }
                     sapply(y,pfun0)
                 }

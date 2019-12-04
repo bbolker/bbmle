@@ -377,7 +377,7 @@ setMethod("plot", signature(x="profile.mle2", y="missing"),
                         t1 <- try(uniroot(function(z) {
                             predict(sp,z)$y-z1
                         }, range(obj[[i]]$par.vals[,nm[i]])),silent=TRUE)
-                        if (inherits(t1,"try-error") NA else t1$root
+                        if (inherits(t1,"try-error")) NA else t1$root
                     }
                     sapply(y,pfun0)
                 }

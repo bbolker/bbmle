@@ -30,9 +30,9 @@
        \item the evaluated
        \code{start} and \code{fixed} components of the call are now stored
        in the \code{call} component (Daniel B. Stouffer)
-   }
-}
-
+     } % itemize
+   } % user-visible changes
+ } % section 1.0.22
 \section{Changes in version 1.0.20 (2017-10-30)}{
   \subsection{BUG FIXES}{
     \itemize{

@@ -3,7 +3,9 @@ Title: Tools for General Maximum Likelihood Estimation
 Description: Methods and functions for fitting maximum likelihood models in R.
 Version: 1.0.22
 Authors@R: c(person("Ben","Bolker",email="bolker@mcmaster.ca",role=c("aut","cre")),
-	   person("R Development Core Team",role=c("aut")))
+	   person("R Development Core Team",role=c("aut")),
+	   person("Iago Giné-Vázquez", role=c("ctb"))
+	  )
 Depends:
     R (>= 3.0.0),
     stats4

@@ -4,12 +4,12 @@ set.seed(101)
 z = rpois(100,lambda=5)
 
 m1 = mle2(z~dpois(lambda=L),start=list(L=4),data=data.frame(z))
-qAICc(m1,nobs=100,dispersion=1.2)
+q1 <- qAICc(m1,nobs=100,dispersion=1.2)
 qAICc(m1,m1,nobs=100,dispersion=1.2) ## !!
 i1 <- ICtab(m1,type="qAICc",dispersion=1.2,nobs=100, base=TRUE)
 
 m2 = glm(z~1,family=poisson)
-qAICc(m2,nobs=100,dispersion=1.2)
+q2 <- qAICc(m2,nobs=100,dispersion=1.2)
 
 ## test that dAIC ignores
 m3 <- glm(z~1,family=quasipoisson)

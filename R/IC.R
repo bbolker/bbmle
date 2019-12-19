@@ -192,15 +192,17 @@ setMethod("qAICc", "mle2",
                   if (missing(dispersion) && is.null(attr(object,"dispersion")))
                       stop("must specify (over)dispersion coefficient")
                   if (length(unique(nobs))>1)
-                      stop("nobs different: must have identical data for all objects")
+                      stop("nobs different: must have identical data for all obj
+ects")
+                  if (length(nobs)==0) stop("must specify nobs")
                   nobs <- nobs[1]
                   logLiks <- sapply(L, logLik)/dispersion
                   df <- sapply(L,attr,"df")+1 ## add one for scale parameter
-                  val <- logLiks+k*df*(df+1)/(nobs-df-1)
+                  val <- -2*logLiks+k*df+k*df*(df+1)/(nobs-df-1)
                   data.frame(AICc=val,df=df)
               } else {
                   df <- attr(object,"df")
-                  c(-2*logLik(object)/dispersion+2*df+2*df*(df+1)/(nobs-df-1))
+                  c(-2*logLik(object)/dispersion+k*df+k*df*(df+1)/(nobs-df-1))
               }
           })
 

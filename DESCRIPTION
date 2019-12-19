@@ -34,6 +34,7 @@ BuildVignettes: yes
 		Description: Methods and functions for fitting maximum likelihood models in R.
     This package modifies and extends the 'mle' classes in the 'stats4' package.
 License: GPL
+URL: https://github.com/bbolker/bbmle
 Collate:
     'mle2-class.R'
     'mle2-methods.R'

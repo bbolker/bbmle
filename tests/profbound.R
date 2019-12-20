@@ -4,8 +4,15 @@ x <- 0:10
 y <- c(26, 17, 13, 12, 20, 5, 9, 8, 5, 4, 8)
 d <- data.frame(x,y)
 
-fit0 <- mle2(y~dpois(lambda=ymean),start=list(ymean=mean(y)),data=d,
-             method="L-BFGS-B",lower=10)
+
+## throws warning on some CRAN system (BDR report 2019-12-20)
+## /tests-noLD/bbmle.Rcheck’
+## * using R Under development (unstable) (2019-12-19 r77606)
+## * using platform: x86_64-pc-linux-gnu (64-bit)
+fit0 <- suppressWarnings(
+    mle2(y~dpois(lambda=ymean),start=list(ymean=mean(y)),data=d,
+         method="L-BFGS-B",lower=10)
+)
 
 stopifnot(is.na(confint(fit0)[1]))
 

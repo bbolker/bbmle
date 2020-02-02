@@ -9,10 +9,14 @@ d <- data.frame(x,y)
 ## /tests-noLD/bbmle.Rcheck’
 ## * using R Under development (unstable) (2019-12-19 r77606)
 ## * using platform: x86_64-pc-linux-gnu (64-bit)
-fit0 <- suppressWarnings(
+## suppressWarnings() doesn't seem to suppress the warning??
+## instead use test from https://www.r-bloggers.com/a-nold-platform-on-r-hub-package-builder/
+if (capabilities("long.double")) {
+   fit0 <- suppressWarnings(
     mle2(y~dpois(lambda=ymean),start=list(ymean=mean(y)),data=d,
          method="L-BFGS-B",lower=10)
-)
+   )
+}
 
 stopifnot(is.na(confint(fit0)[1]))
 

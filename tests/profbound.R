@@ -16,9 +16,8 @@ if (capabilities("long.double")) {
     mle2(y~dpois(lambda=ymean),start=list(ymean=mean(y)),data=d,
          method="L-BFGS-B",lower=10)
    )
+   stopifnot(is.na(confint(fit0)[1]))
 }
-
-stopifnot(is.na(confint(fit0)[1]))
 
 fit1 <- mle2(y~dpois(lambda=exp(a+b*x)),start=list(a=0,b=2),data=d,
              method="L-BFGS-B",lower=-0.2)

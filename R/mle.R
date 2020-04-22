@@ -172,6 +172,7 @@ mle2 <- function(minuslogl,
                  browse_obj=FALSE,
                  gr=NULL,
                  optimfun,
+                 namedrop_hack=FALSE,
                  ...) {
 
     if (missing(method)) method <- mle2.options("optim.method")
@@ -256,8 +257,9 @@ mle2 <- function(minuslogl,
         fullcoef <- formals(minuslogl)
         nfull <- names(fullcoef)
     }
-    if(any(! nfix %in% nfull))
-        stop("some named arguments in 'fixed' are not arguments to the specified log-likelihood function")
+    if(any(! nfix %in% nfull)) {
+        stop("some named arguments in 'fixed' are not arguments to the specified log-likelihood function:",paste(setdiff(nfix,nfull),collapse=", "))
+    }
     if (length(nfix)>0) start[nfix] <- NULL
     fullcoef[nfix] <- fixed
     ## switched namedrop() from outside to inside sapply ?
@@ -331,7 +333,8 @@ mle2 <- function(minuslogl,
         ## doesn't help, environment(minuslogl) is empty by this time
         ## cat("e3:",length(ls(envir=environment(minuslogl))),"\n")
         ## hack to remove unwanted names ...
-        do.call("minuslogl",namedrop(args))
+        if (!namedrop_hack) args <- namedrop(args)
+        do.call("minuslogl", args)
     } ## end of objective function
     objectivefunctiongr <-
         if (!is.null(gr))
@@ -656,12 +659,16 @@ relist2 <- function(v,l) {
     l3
 }
 
+## Prevent unpleasant/unintended collapses of
+##  names from named (length-1) vectors within named lists, i.e.
+##  unlist(list(a=c(a=1))); drop names from length-1 components,
+##  make vector names 1:length(x)
 namedrop <- function(x) {
     if (!is.list(x)) x
     for (i in seq(along=x)) {
         ## cat(i,length(x),"\n")
-        n = names(x[[i]])
-        lx = length(x[[i]])
+        n <- names(x[[i]])
+        lx <- length(x[[i]])
         if (!is.null(n)) {
             if (lx==1) {
                 names(x[[i]]) <- NULL
@@ -670,7 +677,7 @@ namedrop <- function(x) {
             }
         } ## !is.null(names(x[[i]]))
     } ## loop over elements
-    x
+    return(x)
 }
 
 "parnames<-" <- function(obj,value) {

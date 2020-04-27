@@ -172,7 +172,6 @@ mle2 <- function(minuslogl,
                  browse_obj=FALSE,
                  gr=NULL,
                  optimfun,
-                 namedrop_hack=FALSE,
                  ...) {
 
     if (missing(method)) method <- mle2.options("optim.method")
@@ -333,7 +332,7 @@ mle2 <- function(minuslogl,
         ## doesn't help, environment(minuslogl) is empty by this time
         ## cat("e3:",length(ls(envir=environment(minuslogl))),"\n")
         ## hack to remove unwanted names ...
-        if (!namedrop_hack) args <- namedrop(args)
+        args <- namedrop(args)
         do.call("minuslogl", args)
     } ## end of objective function
     objectivefunctiongr <-

@@ -1,7 +1,7 @@
 Package: bbmle
 Title: Tools for General Maximum Likelihood Estimation
 Description: Methods and functions for fitting maximum likelihood models in R.
-Version: 1.0.23.2
+Version: 1.0.23.3
 Authors@R: c(person("Ben","Bolker",email="bolker@mcmaster.ca",role=c("aut","cre")),
 	   person("R Development Core Team",role=c("aut")),
 	   person("Iago Giné-Vázquez", role=c("ctb"))
@@ -48,5 +48,5 @@ Collate:
     'slice.R'
     'impsamp.R'
     'TMB.R'
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 Encoding: UTF-8

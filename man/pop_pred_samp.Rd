@@ -4,10 +4,20 @@
 \alias{pop_pred_samp}
 \title{generate population prediction sample from parameters}
 \usage{
-pop_pred_samp(object, n = 1000, n_imp = n * 10, return_wts = FALSE,
-  impsamp = FALSE, PDify = FALSE, PDmethod = NULL, tol = 1e-06,
-  return_all = FALSE, rmvnorm_method = c("mvtnorm", "MASS"),
-  fix_params = NULL)
+pop_pred_samp(
+  object,
+  n = 1000,
+  n_imp = n * 10,
+  return_wts = FALSE,
+  impsamp = FALSE,
+  PDify = FALSE,
+  PDmethod = NULL,
+  tol = 1e-06,
+  return_all = FALSE,
+  rmvnorm_method = c("mvtnorm", "MASS"),
+  fix_params = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{a fitted \code{mle2} object}
@@ -31,6 +41,8 @@ pop_pred_samp(object, n = 1000, n_imp = n * 10, return_wts = FALSE,
 \item{rmvnorm_method}{package to use for generating MVN samples}
 
 \item{fix_params}{parameters to fix (in addition to parameters that were fixed during estimation)}
+
+\item{...}{additional parameters to pass to the negative log-likelihood function}
 }
 \description{
 This [EXPERIMENTAL] function combines several sampling tricks to compute a version of an importance sample (based on flat priors) for the parameters.

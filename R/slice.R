@@ -138,6 +138,7 @@ slice1D <- function(params,fun,nt=101,
                     upper=Inf,
                     verbose=TRUE,
                     tranges=NULL,
+                    fun_args=NULL,
                     ...) {
   npv <- length(params)
   if (is.null(pn <- names(params))) pn <- seq(npv)
@@ -151,9 +152,10 @@ slice1D <- function(params,fun,nt=101,
   for (i in 1:npv) {
       tvec <- seq(tranges[i,1],tranges[i,2],length=nt)
       if (verbose) cat(pn[i],"\n")
-      vtmp <- sapply(tvec,
+      vtmp <- vapply(tvec,
                      function(t) {
-                         fun(mkpar(params,t,i))})
+                         do.call(fun,c(list(mkpar(params,t,i)),fun_args))
+                     }, numeric(1))
       slices[[i]] <- data.frame(var1=pn[i],x=tvec,z=vtmp)
   }
   r <- list(slices=slices,ranges=tranges,params=params,dim=1)

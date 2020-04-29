@@ -10,6 +10,7 @@
 #' @param PDify use Gill and King generalized-inverse procedure to correct non-positive-definite variance-covariance matrix if necessary?
 #' @param PDmethod method for fixing non-positive-definite covariance matrices
 #' @param rmvnorm_method package to use for generating MVN samples
+#' @param Sigma covariance matrix for sampling
 #' @param tol tolerance for detecting small eigenvalues
 #' @param fix_params parameters to fix (in addition to parameters that were fixed during estimation)
 #' @param return_all return a matrix including all values, and weights (rather than taking a sample)
@@ -25,6 +26,7 @@ pop_pred_samp <- function(object,
                      impsamp=FALSE,
                      PDify=FALSE,
                      PDmethod=NULL,
+                     Sigma=vcov(object),
                      tol = 1e-6,
                      return_all=FALSE,
                      rmvnorm_method=c("mvtnorm","MASS"),
@@ -49,8 +51,7 @@ pop_pred_samp <- function(object,
     keep_params <- !names(cc) %in% fix_params
 
     cc <- cc[keep_params]
-    vv <- vcov(object)
-    vv <- vv[keep_params,keep_params]
+    Sigma <- Sigma[keep_params,keep_params]
 
     fixed_pars <- setdiff(names(object@fullcoef),names(cc))
     res <- matrix(NA,nrow=n,ncol=length(cc_full),
@@ -58,9 +59,9 @@ pop_pred_samp <- function(object,
     if (any(is.na(cc))) return(res)  ## bail out if coefs are NA
 
     ## try to fix bad covariance matrices
-    bad_vcov <- any(is.na(vv))
+    bad_vcov <- any(is.na(Sigma))
     if (!bad_vcov) {
-        min_eig <- min_eval(vv)
+        min_eig <- min_eval(Sigma)
     } else {
         min_eig <- NA
     }
@@ -86,10 +87,10 @@ pop_pred_samp <- function(object,
             ##  we couldn't invert H in the first place ... nearPD
             ##  wants to take a non-pos-def matrix and PDify it.
             ##  (perhaps we could PDify the Hessian and then invert it ???
-            vv <- crossprod(as.matrix(bdsmatrix::gchol(MASS::ginv(hh)),
+            Sigma <- crossprod(as.matrix(bdsmatrix::gchol(MASS::ginv(hh)),
                                       ones = FALSE))
         } else {
-            vv <- as.matrix(Matrix::nearPD(vv)$mat)
+            Sigma <- as.matrix(Matrix::nearPD(Sigma)$mat)
         }
     }
 
@@ -97,8 +98,8 @@ pop_pred_samp <- function(object,
 
     ## draw MVN samples
     res[,names(cc)] <- mv_vals <- switch(rmvnorm_method,
-                                         mvtnorm=mvtnorm::rmvnorm(mv_n, mean=cc, sigma=vv),
-                                         MASS=MASS::mvrnorm(mv_n, mu=cc, Sigma=vv))
+                                         mvtnorm=mvtnorm::rmvnorm(mv_n, mean=cc, sigma=Sigma),
+                                         MASS=MASS::mvrnorm(mv_n, mu=cc, Sigma=Sigma))
     ## fill in fixed parameters as necessary
     if (length(fixed_pars)>0) {
         for (p in fixed_pars) {
@@ -108,7 +109,7 @@ pop_pred_samp <- function(object,
     if (!(impsamp || return_wts)) return(res)  ## done
     
     ## compute MV sampling probabilities
-    mv_wts <- mvtnorm::dmvnorm(mv_vals,mean=cc,sigma=vv,log=TRUE)
+    mv_wts <- mvtnorm::dmvnorm(mv_vals,mean=cc,sigma=Sigma,log=TRUE)
     if (all(is.na(mv_wts)) && length(mv_wts)==1) {
         ## work around emdbook bug
         mv_wts <- rep(NA,length(mv_vals))

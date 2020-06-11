@@ -19,7 +19,9 @@ use.ginv=TRUE,
 trace=FALSE,
 browse_obj=FALSE,
 gr=NULL,
-optimfun,\dots)
+optimfun,
+namedrop_args=FALSE,
+\dots)
 calc_mle2_function(formula,parameters, links, start,
    parnames, use.deriv=FALSE, data=NULL,trace=FALSE)
 }
@@ -68,7 +70,8 @@ calc_mle2_function(formula,parameters, links, start,
   \item{optimfun}{user-supplied optimization function. Must take exactly
     the same arguments and return exactly the same structure as \code{\link{optim}}.}
   \item{use.deriv}{(experimental, not yet implemented): construct symbolic
-     derivatives based on formula?}
+    derivatives based on formula?}
+  \item{namedrop_args}{hack: drop names in sub-lists occurring in data?}
  }
  \section{Warning}{Do not use a higher-level variable named \code{.i} in
    \code{parameters} -- this is reserved for internal use.

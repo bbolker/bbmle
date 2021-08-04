@@ -15,11 +15,14 @@ sliceOld(fitted, which = 1:p, maxsteps = 100,
                        del = zmax/5, trace = FALSE,
                        tol.newmin=0.001, \dots)
 slice1D(params,fun,nt=101,lower=-Inf,
-                    upper=Inf,verbose=TRUE, tranges=NULL,\dots)
+                    upper=Inf,verbose=TRUE, tranges=NULL,
+                    fun_args = NULL,
+                    \dots)
 slice2D(params,fun,nt=31,lower=-Inf,
                     upper=Inf,
                     cutoff=10,verbose=TRUE,
-                    tranges=NULL, \dots)
+                    tranges=NULL,
+                    \dots)
 slicetrans(params, params2, fun, extend=0.1, nt=401,
                        lower=-Inf, upper=Inf)
 }
@@ -29,6 +32,7 @@ slicetrans(params, params2, fun, extend=0.1, nt=401,
   \item{params}{a named vector of baseline parameter values}
   \item{params2}{a vector of parameter values}
   \item{fun}{an objective function}
+  \item{fun_args}{additional arguments to pass to \code{fun}}
   \item{nt}{(integer) number of slice-steps to take}
   \item{lower}{lower bound(s) (stub?)}
   \item{upper}{upper bound(s) (stub?)}

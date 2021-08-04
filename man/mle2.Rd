@@ -20,7 +20,7 @@ trace=FALSE,
 browse_obj=FALSE,
 gr=NULL,
 optimfun,
-namedrop_args=FALSE,
+namedrop_args=TRUE,
 \dots)
 calc_mle2_function(formula,parameters, links, start,
    parnames, use.deriv=FALSE, data=NULL,trace=FALSE)

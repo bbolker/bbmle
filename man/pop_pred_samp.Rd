@@ -12,6 +12,7 @@ pop_pred_samp(
   impsamp = FALSE,
   PDify = FALSE,
   PDmethod = NULL,
+  Sigma = vcov(object),
   tol = 1e-06,
   return_all = FALSE,
   rmvnorm_method = c("mvtnorm", "MASS"),
@@ -42,6 +43,7 @@ pop_pred_samp(
 
 \item{fix_params}{parameters to fix (in addition to parameters that were fixed during estimation)}
 
+\item{Sigma}{covariance matrix for sampling}
 \item{...}{additional parameters to pass to the negative log-likelihood function}
 }
 \description{

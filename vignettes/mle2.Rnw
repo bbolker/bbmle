@@ -124,7 +124,9 @@ Fit the model --- use \code{data} to pass the \code{size}
 parameter (since it wasn't hard-coded in the \code{mtmp}
 function):
 <<fit1,warning=FALSE>>=
-(m0 <- mle2(mtmp,start=list(prob=0.2,theta=9),data=list(size=50)))
+suppressWarnings(
+    m0 <- mle2(mtmp,start=list(prob=0.2,theta=9),data=list(size=50))
+)
 @
 (here and below, I'm suppressing lots of warnings about {\tt NaNs produced})
 
@@ -151,7 +153,9 @@ then it is more efficient to compute the profile
 once):
 
 <<prof1,cache=TRUE,warning=FALSE>>=
-p0 <- profile(m0)
+suppressWarnings(
+    p0 <- profile(m0)
+)
 @ 
 
 Compare the confidence interval estimates based on

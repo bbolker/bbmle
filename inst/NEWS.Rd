@@ -4,12 +4,13 @@
 \title{bbmle News}
 \encoding{UTF-8}
 
+\section{Changes in version 1.0.23.5}{
+}
 \section{Changes in version 1.0.23}{
   \itemize{
     \item suppress some warnings in tests for cross-platform/CRAN compatibility
   }
 }
-
 \section{Changes in version 1.0.22 (2012-12-19)}{
   \subsection{BUG FIXES}{
     \itemize{

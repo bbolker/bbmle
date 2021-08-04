@@ -1,6 +1,6 @@
 Package: bbmle
 Title: Tools for General Maximum Likelihood Estimation
-Description: Methods and functions for fitting maximum likelihood models in R.
+Description: Methods and functions for fitting maximum likelihood models in R. This package modifies and extends the 'mle' classes in the 'stats4' package.
 Version: 1.0.23.5
 Authors@R: c(person("Ben","Bolker",email="bolker@mcmaster.ca",role=c("aut","cre")),
 	   person("R Development Core Team",role=c("aut")),
@@ -31,8 +31,6 @@ Suggests:
     testthat
 VignetteBuilder: knitr
 BuildVignettes: yes
-		Description: Methods and functions for fitting maximum likelihood models in R.
-    This package modifies and extends the 'mle' classes in the 'stats4' package.
 License: GPL
 URL: https://github.com/bbolker/bbmle
 Collate:

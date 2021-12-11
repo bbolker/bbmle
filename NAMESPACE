@@ -5,8 +5,9 @@ export(stdEr,vcov)
 export(slice,sliceOld,slice1D,slice2D)
 export(proffun)
 export(pop_pred_samp)
+export(mle2.options)
 exportClasses(mle2,summary.mle2)
-exportMethods(AIC, AICc, qAICc, qAIC, 
+exportMethods(AIC, AICc, qAICc, qAIC,
                profile, coef, confint, logLik,
               update, vcov, anova, deviance, residuals,
               simulate, predict, formula, plot, stdEr, summary)

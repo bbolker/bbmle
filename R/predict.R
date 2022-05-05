@@ -47,16 +47,19 @@ setMethod("residuals", "mle2",
 gfun <- function(object,newdata=NULL,location=c("mean","median","variance"),
                  nsim,
                  op=c("predict","simulate")) {
-  ## notes: should operate on formula
-  ## pull out call$formula (not character)
-  location <- match.arg(location)
-  if (class(try(form <- as.formula(object@call$minuslogl)))!="formula")
-    stop("can only use predict() if formula specified")
-  LHS <- form[[3]]
-  ddist = as.character(LHS[[1]])
-  spref <- switch(op,predict="s",simulate="r")
-  sdist = gsub("^d",spref,ddist)
-  arglist = as.list(LHS)[-1]
+    ## notes: should operate on formula
+    ## pull out call$formula (not character)
+    location <- match.arg(location)
+    form <- try(as.formula(object@call$minuslogl))
+    if (inherits(form, "try-error") ||
+        !inherits(form, "formula")) {
+        stop("can only use predict() if formula specified")
+    }
+    LHS <- form[[3]]
+    ddist <- as.character(LHS[[1]])
+    spref <- switch(op,predict="s",simulate="r")
+    sdist  <- gsub("^d",spref,ddist)
+    arglist <- as.list(LHS)[-1]
   if (!exists(sdist) || !is.function(get(sdist)))
     stop("function ",sdist," does not exist")
   ## evaluate parameters

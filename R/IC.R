@@ -246,8 +246,10 @@ setMethod("qAIC", "mle2",
               L <- list(...)
               if (length(L)) {
                   L <- c(list(object),L)
-                  if (!all(sapply(L,class)=="mle2"))
+                  if (!all(sapply(L,
+                                  function(x) inherits(x, "mle2")))) {
                       stop("all objects in list must be class mle2")
+                  }
                   logLiks <- lapply(L, logLik)
                   AICs <- sapply(logLiks,qAIC, k=k, dispersion=dispersion)
                   df <- sapply(L,attr,"df")

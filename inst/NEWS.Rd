@@ -4,12 +4,17 @@
 \title{bbmle News}
 \encoding{UTF-8}
 
-\section{Changes in version 1.0.2.5}{
+\section{Changes in version 1.0.25}{
   \subsection{USER-VISIBLE CHANGES}{
     \itemize{
       \item \code{mle2.options()} function is now exported
     }
   }    
+  \subsection{CRAN COMPATIBILITY}{
+    \itemize{
+      \item vignettes will build without suggested packages
+    }
+  }
 }
 
 \section{Changes in version 1.0.24 (2021-08-06)}{

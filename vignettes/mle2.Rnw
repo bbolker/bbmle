@@ -249,10 +249,11 @@ summary(orob1)
 Now construct a negative log-likelihood
 function that differentiates among groups:
 <<aodlikfun>>=
-ML1 <- function(prob1,prob2,prob3,theta,x) {
-  prob <- c(prob1,prob2,prob3)[as.numeric(x$dilution)]
-  size <- x$n
-  -sum(dbetabinom(x$m,prob,size,theta,log=TRUE))
+X <- model.matrix(~dilution, data = orob1)
+nll <- function(beta, theta) {
+  prob <- plogis(X %*% beta)
+  size <- orob1$n
+  -sum(dbetabinom(x$m,prob, size, theta,log=TRUE))
 }
 @ 
 

@@ -18,6 +18,7 @@ clean
 \.blg$
 \.out$
 \.tex$
+\.Rout$
 \.toc
 \.tar.gz$
 jss\.cls
@@ -28,4 +29,3 @@ cache/.*
 README.md
 revdep/
 LICENSE
-.*.RData

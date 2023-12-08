@@ -4,6 +4,14 @@
 \title{bbmle News}
 \encoding{UTF-8}
 
+\section{Changes in version 1.0.25.1}{
+  \subsection{CRAN COMPATIBILITY}{
+    \itemize{
+      \item remove/ignore spurious .Rout files
+    }
+  }
+}
+
 \section{Changes in version 1.0.25}{
   \subsection{USER-VISIBLE CHANGES}{
     \itemize{

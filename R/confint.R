@@ -45,6 +45,7 @@ function (object, parm, level = 0.95, trace=FALSE, ...)
 setMethod("confint", "mle2",
 function (object, parm, level = 0.95, method,
           trace=FALSE,quietly=!interactive(),
+          std.err = NULL,
           tol.newmin=0.001,...)
 {
   if (missing(method)) method <- mle2.options("confint")
@@ -81,7 +82,8 @@ function (object, parm, level = 0.95, method,
     pct <- paste(round(100 * a, 1), "%")
     ci <- array(NA, dim = c(length(parm), 2),
                 dimnames = list(pnames[parm], pct))
-    std.err <- summary(object)@coef[, "Std. Error"]
+    if (is.null(std.err)) std.err <- summary(object)@coef[, "Std. Error"]
+    std.err <- rep(std.err, length.out = length(coef(object)))
     if (method=="uniroot") {
       chisqcutoff <- qchisq(level,1)
       call <- object@call

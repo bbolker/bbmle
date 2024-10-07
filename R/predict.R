@@ -88,7 +88,7 @@ gfun <- function(object,newdata=NULL,location=c("mean","median","variance"),
     } else {
       mmats <- list()
       vpos <- list()
-      for (i in seq(along=parameters)) {
+      for (i in seq_along(parameters)) {
         vname <- vars[i]
         p <- parameters[[i]]
         p[[2]] <- NULL

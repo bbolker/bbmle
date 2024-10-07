@@ -50,8 +50,9 @@ function (object, parm, level = 0.95, method,
   if (missing(method)) method <- mle2.options("confint")
   ## changed coef() calls to object@coef -- really *don't* want fullcoef!
   Pnames <- names(object@coef)
-  if (missing(parm))
-    parm <- seq(along=Pnames)
+  if (missing(parm)) {
+      parm <- seq_along(Pnames)
+  }
   if (is.character(parm)) parm <- match(parm,Pnames)
   if (any(is.na(parm))) stop("parameters not found in model coefficients")
   if (method=="spline") {
@@ -69,8 +70,9 @@ function (object, parm, level = 0.95, method,
   } else {
     B0 <- object@coef
     pnames <- names(B0)
-    if (missing(parm))
-      parm <- seq(along=pnames)
+    if (missing(parm)) {
+        parm <- seq_along(pnames)
+    }
     if (is.character(parm))
       parm <- match(parm, pnames, nomatch = 0)
     a <- (1 - level)/2

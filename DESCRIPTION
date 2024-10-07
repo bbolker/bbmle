@@ -47,5 +47,5 @@ Collate:
     'slice.R'
     'impsamp.R'
     'TMB.R'
-RoxygenNote: 7.1.0
+RoxygenNote: 7.3.0
 Encoding: UTF-8

@@ -62,7 +62,7 @@ calc_mle2_function <- function(formula,
             vpos <- list()
             pnames0 <- parnames
             names(parnames) <- parnames
-            for (i in seq(along=parameters)) {
+            for (i in seq_along(parameters)) {
                 vname <- vars[i]      ## name of variable
                 p <- parameters[[i]]  ## formula for variable
                 p[[2]] <- NULL        ## RHS only
@@ -104,7 +104,7 @@ calc_mle2_function <- function(formula,
         ## need to look for parameters etc.
         pars <- unlist(as.list(match.call())[-1])
         if (!is.null(parameters)) {
-            for (.i in seq(along=parameters)) {
+            for (.i in seq_along(parameters)) {
                 assign(vars[.i],mmats[[.i]] %*% pars[vpos[[.i]]])
             }
         }
@@ -308,7 +308,7 @@ mle2 <- function(minuslogl,
     denv <- local(environment(),c(as.list(data),fdata,list(mleenvset=TRUE)))
     ## denv <- local(new.env(),c(as.list(data),fdata,list(mleenvset=TRUE)))
     argnames.in.data <- names(data)[names(data) %in% names(formals(minuslogl))]
-    args.in.data <- lapply(argnames.in.data,get,env=denv)
+    args.in.data <- lapply(argnames.in.data, get, envir=denv)
     names(args.in.data) <- argnames.in.data
     args.in.data  ## codetools kluge
     objectivefunction <- function(p){
@@ -558,12 +558,12 @@ mle2 <- function(minuslogl,
                    }
         oout$maxgrad <-  max(abs(gradvec))
         if (!skip.hessian) {
-            if (inherits(ev <- try(eigen(oout$hessian)$value,silent=TRUE),
-                         "try-error")) ev <- NA
+            if (inherits(ev <- try(eigen(oout$hessian)$values,silent=TRUE),
+                         "troy-error")) ev <- NA
             oout$eratio <- min(Re(ev))/max(Re(ev))
         }
     }
-    if (!is.null(conv <- oout$conv) &&
+    if (!is.null(conv <- oout$convergence) &&
         ((optimizer=="nlm" && conv>2) ||
          (optimizer!="nlm" && conv!=0))) {
         ## warn of convergence failure
@@ -665,7 +665,7 @@ relist2 <- function(v,l) {
 ##  make vector names 1:length(x)
 namedrop <- function(x) {
     if (!is.list(x)) x
-    for (i in seq(along=x)) {
+    for (i in seq_along(x)) {
         ## cat(i,length(x),"\n")
         n <- names(x[[i]])
         lx <- length(x[[i]])

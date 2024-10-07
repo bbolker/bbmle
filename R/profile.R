@@ -349,7 +349,7 @@ setMethod("plot", signature(x="profile.mle2", y="missing"),
     }
     if (missing(main)) 
         main <- paste("Likelihood profile:",nm)
-    main <- rep(main,length=length(nm))
+    main <- rep(main, length.out = length(nm))
     for (i in seq(along = nm)[which]) {
         ## <FIXME> This does not need to be monotonic
         ## cat("**",i,obj[[i]]$par.vals[,i],obj[[i]]$z,"\n")

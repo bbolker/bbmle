@@ -12,7 +12,8 @@
 \usepackage{natbib}
 \usepackage{array}
 \usepackage{color}
-\usepackage[colorlinks=true,urlcolor=blue,bookmarks=true]{hyperref}
+\usepackage[colorlinks=true,bookmarks=true]{hyperref}
+\hypersetup{linkcolor=purple,urlcolor=blue,citecolor=gray}
 \usepackage{url}
 \author{Ben Bolker}
 \title{Maximum likelihood estimation and analysis
@@ -152,7 +153,7 @@ intervals at several different $\alpha$ values]
 then it is more efficient to compute the profile
 once):
 
-<<prof1,cache=TRUE,warning=FALSE>>=
+<<prof1,warning=FALSE>>=
 suppressWarnings(
     p0 <- profile(m0)
 )
@@ -248,14 +249,19 @@ summary(orob1)
 
 Now construct a negative log-likelihood
 function that differentiates among groups:
+
 <<aodlikfun>>=
 X <- model.matrix(~dilution, data = orob1)
-nll <- function(beta, theta) {
-  prob <- plogis(X %*% beta)
-  size <- orob1$n
-  -sum(dbetabinom(x$m,prob, size, theta,log=TRUE))
+ML1 <- function(prob1,prob2,prob3,theta,x) {
+  prob <- c(prob1,prob2,prob3)[as.numeric(x$dilution)]
+  size <- x$n
+  -sum(dbetabinom(x$m,prob,size,theta,log=TRUE))
 }
 @ 
+
+%  Would like to show an intermediate example that does plogis(X %*% beta)
+% explicitly but argument processing is messed up for list-like parameters ...
+% sigh ...
 
 Results from \cite{Crowder1978}:
 <<crowdertab,echo=FALSE,results="asis">>=
@@ -268,10 +274,11 @@ crowder.results <- matrix(c(0.132,0.871,0.839,78.424,0.027,0.028,0.032,-34.991,
 latex(crowder.results,file="",table.env=FALSE,title="model")
 @
 
-<<aodfit1,cache=TRUE,warning=FALSE>>=
-(m1 <- mle2(ML1,start=list(prob1=0.5,prob2=0.5,prob3=0.5,theta=1),
+<<aodfit1,warning=FALSE,depends.on="aodlikfun">>=
+(m1 <- mle2(ML1,
+            start=list(prob1=0.5,prob2=0.5,prob3=0.5,theta=1),
             data=list(x=orob1)))
-@ 
+@
 
 Or:
 <<eval=FALSE>>=
@@ -280,7 +287,10 @@ Or:
              param=list(prob~dilution),
              start=list(prob=0.5,theta=1),
     data=orob1))
-@ 
+@
+
+
+ 
 The result warns us that the optimization has not
 converged; we also don't match
 Crowder's results for $\theta$ exactly.
@@ -300,7 +310,7 @@ warnings, those you weren't expecting as well as those you were \ldots)
 <<suppWarn,echo=FALSE>>=
 opts_chunk$set(warning=FALSE)
 @ 
-<<aodfit2,cache=TRUE>>=
+<<aodfit2>>=
 (m2 <- mle2(ML1,start=as.list(coef(m1)),
           control=list(parscale=coef(m1)),
           data=list(x=orob1)))
@@ -309,7 +319,7 @@ opts_chunk$set(warning=FALSE)
 Calculate likelihood profile (restrict the upper limit
 of $\theta$, simply because it will make the picture
 below a little bit nicer):
-<<aodprof2,cache=TRUE>>=
+<<aodprof2>>=
 p2 <- profile(m2,prof.upper=c(Inf,Inf,Inf,theta=2000))
 @ 
 
@@ -364,13 +374,16 @@ r1
 
 Plot the profile:
 <<profplottheta>>=
-plot(p2,which="theta",plot.confstr=TRUE)
+plot(p2, which="theta",plot.confstr=TRUE, show.points = TRUE)
 @ 
 
 What does the profile for $\sigma$ look like?
+
 <<profplotsigma>>=
-plot(p2b,which="sigma",plot.confstr=TRUE,
-     show.points=TRUE)
+## not working?
+## plot(p2b,which="sigma",plot.confstr=TRUE, show.points=TRUE)
+par(las = 1, bty = "l")
+with(p2b@profile$sigma, plot(par.vals[,"sigma"], abs(z), type = "b"))
 @ 
 
 Now fit a homogeneous model:

@@ -35,6 +35,8 @@ pop_pred_samp(
 
 \item{PDmethod}{method for fixing non-positive-definite covariance matrices}
 
+\item{Sigma}{covariance matrix for sampling}
+
 \item{tol}{tolerance for detecting small eigenvalues}
 
 \item{return_all}{return a matrix including all values, and weights (rather than taking a sample)}
@@ -43,7 +45,6 @@ pop_pred_samp(
 
 \item{fix_params}{parameters to fix (in addition to parameters that were fixed during estimation)}
 
-\item{Sigma}{covariance matrix for sampling}
 \item{...}{additional parameters to pass to the negative log-likelihood function}
 }
 \description{

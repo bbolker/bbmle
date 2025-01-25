@@ -52,8 +52,10 @@
    show.points=FALSE,
    main, xlim, ylim, \dots)
 \S4method{confint}{mle2}(object, parm, level = 0.95, method,
-          trace=FALSE,quietly=!interactive(),
-          tol.newmin=0.001,\dots)
+    trace=FALSE,quietly=!interactive(),
+    std.err = NULL,
+    tol.newmin=0.001,
+    \dots)
 \S4method{confint}{profile.mle2}(object, parm, level = 0.95, trace=FALSE, \dots)
 }
 \arguments{
@@ -99,6 +101,9 @@
   \item{main}{(logical) main title}
   \item{xlim}{x limits}
   \item{ylim}{y limits}
+  \item{std.err}{(vector of) approximate standard error(s), for
+    determining the initial scale of a likelihood profile calculation
+    when the Wald standard error is unavailable or unreliable}
   \item{\dots}{other arguments}
 }
 \seealso{

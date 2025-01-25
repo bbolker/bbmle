@@ -14,6 +14,7 @@ default.start=TRUE, eval.only = FALSE, vecpar=FALSE,
 parameters=NULL,
 parnames=NULL,
 skip.hessian=FALSE,
+hessian.method = c("numDeriv", "optimHess"),
 hessian.opts=NULL,
 use.ginv=TRUE,
 trace=FALSE,
@@ -63,6 +64,8 @@ calc_mle2_function(formula,parameters, links, start,
   \item{trace}{Logical: print parameter values tested?}
   \item{browse_obj}{Logical: drop into browser() within the objective function?}
   \item{skip.hessian}{Bypass Hessian calculation?}
+  \item{hessian.method}{Method for Hessian computation: "numDeriv" =
+    \code{numDeriv::hessian()}, "optimHess" = \code{stats::optimHess}}
   \item{hessian.opts}{Options for Hessian calculation, passed through to
     the \code{\link[numDeriv]{hessian}} function}
   \item{use.ginv}{Use generalized inverse (\code{\link[MASS]{ginv}}) to

@@ -166,6 +166,7 @@ mle2 <- function(minuslogl,
                  parameters=NULL,
                  parnames=NULL,
                  skip.hessian=FALSE,
+                 hessian.method = c("numDeriv", "optimHess"),
                  hessian.opts=NULL,
                  use.ginv=TRUE,
                  trace=FALSE,
@@ -175,6 +176,7 @@ mle2 <- function(minuslogl,
                  namedrop_args=TRUE,
                  ...) {
 
+    hessian.method <- match.arg(hessian.method)
     if (missing(method)) method <- mle2.options("optim.method")
     if (missing(optimizer)) optimizer <- mle2.options("optimizer")
     L <- list(...)
@@ -498,25 +500,33 @@ mle2 <- function(minuslogl,
     if (!skip.hessian) {
         psc <- call$control$parscale
         if (is.null(gr)) {
+            hessfun <- switch(hessian.method,
+                              numDeriv = numDeriv::hessian,
+                              optimHess = stats::optimHess)
             if (is.null(psc)) {
-                oout$hessian <- try(hessian(objectivefunction,oout$par,
+                oout$hessian <- try(hessfun(objectivefunction,oout$par,
                                             method.args=hessian.opts))
             } else {
                 tmpf <- function(x) {
                     objectivefunction(x*psc)
                 }
-                oout$hessian <- try(hessian(tmpf,oout$par/psc,
+                oout$hessian <- try(hessfun(tmpf,oout$par/psc,
                                             method.args=hessian.opts))/outer(psc,psc)
             }
         } else { ## gradient provided
+            hessfun <- switch(hessian.method,
+                              numDeriv = numDeriv::jacobian,
+                              optimHess = stats::optimHess)
+            
+
             if (is.null(psc)) {
-                oout$hessian <- try(jacobian(objectivefunctiongr,oout$par,
+                oout$hessian <- try(hessfun(objectivefunctiongr,oout$par,
                                              method.args=hessian.opts))
             } else {
                 tmpf <- function(x) {
                     objectivefunctiongr(x*psc)
                 }
-                oout$hessian <- try(jacobian(tmpf,oout$par/psc,
+                oout$hessian <- try(hessfun(tmpf,oout$par/psc,
                                              method.args=hessian.opts))/outer(psc,psc)
             }
         }

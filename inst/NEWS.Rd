@@ -4,7 +4,20 @@
 \title{bbmle News}
 \encoding{UTF-8}
 
-\section{Changes in version 1.0.25.1}{
+\section{Changes in version 1.0.26}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item \code{confint} method gains a \code{std.err} argument, for
+      use when Wald standard errors are unavailable or unreliable
+      \item \code{mle2} gains a \code{hessian.method} argument, which can
+      be set to "optimHess" when the default method (\code{hessian} or
+      \code{jacobian} from the \code{numDeriv} package) is unreliable
+    }
+  }
+}
+
+  
+\section{Changes in version 1.0.25.1 (2023-12-09)}{
   \subsection{CRAN COMPATIBILITY}{
     \itemize{
       \item remove/ignore spurious .Rout files
@@ -12,7 +25,7 @@
   }
 }
 
-\section{Changes in version 1.0.25}{
+\section{Changes in version 1.0.25 (2022-05-11)}{
   \subsection{USER-VISIBLE CHANGES}{
     \itemize{
       \item \code{mle2.options()} function is now exported

@@ -498,41 +498,36 @@ mle2 <- function(minuslogl,
     }
     namatrix <- matrix(NA,nrow=length(start),ncol=length(start))
     if (!skip.hessian) {
-        psc <- call$control$parscale
+        ## set parscale to vector of ones if NULL
+        psc <- call$control$parscale %||% rep(1, length(oout$par))
+        pscmat <- outer(psc, psc)
+        tmpf <- function(x) objectivefunction(x*psc)
         if (is.null(gr)) {
-            hessfun <- switch(hessian.method,
-                              numDeriv = numDeriv::hessian,
-                              optimHess = stats::optimHess)
-            if (is.null(psc)) {
-                oout$hessian <- try(hessfun(objectivefunction,oout$par,
-                                            method.args=hessian.opts))
-            } else {
-                tmpf <- function(x) {
-                    objectivefunction(x*psc)
-                }
-                oout$hessian <- try(hessfun(tmpf,oout$par/psc,
-                                            method.args=hessian.opts))/outer(psc,psc)
-            }
+            oout$hessian <- try(switch(hessian.method,
+                                       numDeriv = numDeriv::hessian(func = tmpf,
+                                                                    x = oout$par/psc,
+                                                                    method.args=hessian.opts),
+                                       optimHess = do.call(stats::optimHess,
+                                                           c(list(par = oout$par, fn = objectivefunction),
+                                                             hessian.opts)))
+                                )
         } else { ## gradient provided
-            hessfun <- switch(hessian.method,
-                              numDeriv = numDeriv::jacobian,
-                              optimHess = stats::optimHess)
-            
-
-            if (is.null(psc)) {
-                oout$hessian <- try(hessfun(objectivefunctiongr,oout$par,
-                                             method.args=hessian.opts))
-            } else {
-                tmpf <- function(x) {
-                    objectivefunctiongr(x*psc)
-                }
-                oout$hessian <- try(hessfun(tmpf,oout$par/psc,
-                                             method.args=hessian.opts))/outer(psc,psc)
-            }
+            tmpfgr <- function(x) objectivefunctiongr(x*psc)
+            oout$hessian <- try(switch(hessian.method,
+                                       numDeriv = numDeriv::jacobian(func = tmpfgr,
+                                                                     x = oout$par/psc,
+                                                                     method.args=hessian.opts),
+                                       optimHess = do.call(stats::optimHess,
+                                                           c(list(par = oout$par/psc,
+                                                                  fn = tmpf,
+                                                                  gr = tmpfgr),
+                                                             hessian.opts))))
         }
-    }
-    if (skip.hessian || inherits(oout$hessian,"try-error"))
+        oout$hessian <- oout$hessian / pscmat
+    } ## !skip.hessian
+    if (skip.hessian || inherits(oout$hessian,"try-error")) {
         oout$hessian <- namatrix
+    }
     coef <- oout$par
     nc <- names(coef)
     if (skip.hessian) {

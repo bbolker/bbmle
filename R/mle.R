@@ -8,6 +8,36 @@ call.to.char <- function(x) {
     paste(sapply(x,as.character),collapse="")
 }
 
+## GH #31: optimx() silently returns NA parameter estimates (rather than
+## erroring) when the package providing a requested method isn't
+## installed; check up front -- using optimx's own method/package
+## registry (optimx::ctrldefault()$allmeth/$allpkg) -- and give an
+## informative error instead
+check_optimx_method <- function(method) {
+    if (!requireNamespace("optimx", quietly=TRUE)) {
+        stop("optimizer=\"optimx\" requires the 'optimx' package to be installed")
+    }
+    ctrl <- optimx::ctrldefault(1)
+    allmeth <- ctrl$allmeth
+    allpkg <- ctrl$allpkg
+    unknown <- setdiff(method, allmeth)
+    if (length(unknown)>0) {
+        stop("unknown optimx method(s): ", paste(sQuote(unknown), collapse=", "),
+             "; valid methods are: ", paste(allmeth, collapse=", "))
+    }
+    needpkg <- setNames(allpkg[match(method, allmeth)], method)
+    ## "stats" (base R) and "optimx" itself are always available at this point
+    needpkg <- needpkg[!needpkg %in% c("stats","optimx")]
+    if (length(needpkg)==0) return(invisible(NULL))
+    avail <- vapply(needpkg, requireNamespace, logical(1), quietly=TRUE)
+    if (any(!avail)) {
+        stop("optimx method(s) ", paste(sQuote(names(needpkg)[!avail]), collapse=", "),
+             " require package(s) that are not installed: ",
+             paste(unique(needpkg[!avail]), collapse=", "))
+    }
+    invisible(NULL)
+}
+
 ## FIXME: problem with bounds and formulae!
 calc_mle2_function <- function(formula,
                                parameters,
@@ -179,6 +209,7 @@ mle2 <- function(minuslogl,
     hessian.method <- match.arg(hessian.method)
     if (missing(method)) method <- mle2.options("optim.method")
     if (missing(optimizer)) optimizer <- mle2.options("optimizer")
+    if (optimizer=="optimx") check_optimx_method(method)
     L <- list(...)
     if (optimizer=="optimize" && (is.null(L$lower) || is.null(L$upper)))
         stop("lower and upper bounds must be specified when using
@@ -487,6 +518,17 @@ mle2 <- function(minuslogl,
         ## optimizer (bobyqa?) may have stripped names -- try to restore them!
         is.null(names(oout$par))) {
         names(oout$par) <- names(start)
+    }
+
+    ## GH #31: guard against a silent NA-parameter failure further downstream
+    ## (e.g. optimx methods failing for reasons other than a missing package,
+    ## which check_optimx_method() already screens for)
+    if (length(oout$par)>0 && anyNA(oout$par)) {
+        stop("optimizer '", optimizer, "' returned NA parameter estimate(s); ",
+             "this usually indicates a numerical failure in the optimizer",
+             if (optimizer=="optimx")
+                 " (if using an external method, double-check that the required package is installed and working correctly)"
+             else "")
     }
 
     ## compute Hessian

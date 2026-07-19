@@ -25,6 +25,14 @@
       \item fixed inconsistent degrees-of-freedom adjustment in
       \code{qAICc}, which caused \code{qAICc()} on a single object to
       disagree with \code{qAICc()} on multiple objects (GH #22)
+      \item \code{mle2(optimizer="optimx")} now checks up front that the
+      requested \code{method}(s) are recognized and that any packages
+      they require (e.g. \code{minqa} for \code{"bobyqa"}/\code{"newuoa"},
+      \code{BB} for \code{"spg"}, \code{ucminf} for \code{"ucminf"},
+      \code{dfoptim} for \code{"nmkb"}/\code{"hjkb"}) are installed,
+      instead of silently returning NA parameter estimates; a generic
+      check also now catches NA parameter results from any optimizer
+      (GH #31)
     }
   }
 }

@@ -3,7 +3,7 @@ library(bbmle)
 funcresp <-
 structure(list(Initial = as.integer(c(5, 5, 10, 10, 15, 15, 20, 
 20, 30, 30, 50, 50, 75, 75, 100, 100)), Killed = as.integer(c(1, 
-2, 5, 6, 10, 9, 7, 10, 11, 15, 5, 21, 32, 18, 25, 35))), .Names = c("Initial", 
+2, 5, 6, 10, 9, 7, 10, 11, 15, 5, 21, 32, 18, 25, 35))), names = c("Initial", 
 "Killed"), class = "data.frame", row.names = c("1", "2", "3", 
 "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", 
 "16"))

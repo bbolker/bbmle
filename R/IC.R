@@ -27,7 +27,10 @@ ICtab <- function(...,type=c("AIC","BIC","AICc","qAIC","qAICc"),
     }
     ICs <- switch(type,
                   AIC=sapply(L,AIC),
-                  BIC=sapply(L,BIC),
+                  BIC=sapply(L,function(x) {
+                      ll <- logLik(x)
+                      -2*c(ll) + attr(ll,"df")*log(nobs)
+                  }),
                   AICc=sapply(L,AICc,nobs=nobs),
                   qAIC=sapply(L,qAIC,dispersion=dispersion),
                   qAICc=sapply(L,qAICc,nobs=nobs,dispersion=dispersion))

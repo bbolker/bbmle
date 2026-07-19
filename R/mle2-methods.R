@@ -82,6 +82,8 @@ function (object, ...)
     val
   })
 
+setMethod("nobs", "mle2", function(object, ...) attr(object, "nobs"))
+
 setGeneric("deviance", function(object, ...) standardGeneric("deviance"))
 setMethod("deviance", "mle2",
 function (object, ...)

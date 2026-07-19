@@ -14,6 +14,16 @@
       \code{jacobian} from the \code{numDeriv} package) is unreliable
     }
   }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item added a \code{nobs} method for \code{mle2} objects; its
+      absence made \code{BICtab}/\code{ICtab(type="BIC")} fail
+      unconditionally, and made \code{AICc}/\code{qAICc} fall back to
+      unreliable heuristics (GH #35)
+      \item \code{ICtab(type="BIC")} now respects an explicit
+      \code{nobs} argument, instead of silently ignoring it (GH #35)
+    }
+  }
 }
 
   

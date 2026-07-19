@@ -10,9 +10,9 @@ exportClasses(mle2,summary.mle2)
 exportMethods(AIC, AICc, qAICc, qAIC,
                profile, coef, confint, logLik,
               update, vcov, anova, deviance, residuals,
-              simulate, predict, formula, plot, stdEr, summary)
+              simulate, predict, formula, plot, stdEr, summary, nobs)
 importClassesFrom(stats4,mle)
-importFrom(stats4,coef,confint,logLik,BIC,summary,profile,vcov,AIC, update, plot)
+importFrom(stats4,coef,confint,logLik,BIC,summary,profile,vcov,AIC, update, plot, nobs)
 importFrom(stats,
            anova,deviance,residuals,
            simulate,predict,formula,napredict,na.omit,na.exclude,

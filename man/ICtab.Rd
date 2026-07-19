@@ -47,22 +47,32 @@ AICctab(\dots,mnames)
   \item{dIC}{difference in IC from minimum-IC model}
   \item{weights}{exp(-dIC/2)/sum(exp(-dIC/2))}
 }
-\note{(1) The print method uses sensible defaults; all ICs are rounded
-  to the nearest 0.1, and IC weights are printed using
-  \code{\link{format.pval}} to print an inequality for
-  values <0.001. (2) The computation of degrees of freedom/number of
-  parameters (e.g., whether
-  variance parameters are included in the total) varies enormously
-  between packages.  As long as the df computations
-  for a given set of models is consistent, differences
-  don't matter, but one needs to be careful with log likelihoods
-  and models taken from different packages.  If necessary
-  one can change the degrees of freedom manually by
-  saying \code{attr(obj,"df") <- df.new}, where \code{df.new}
-  is the desired number of parameters.
-  (3) Defaults have changed to \code{sort=TRUE}, \code{base=FALSE},
-  \code{delta=TRUE}, to match my conviction that it rarely makes
-  sense to report the overall values of information criteria}
+\note{
+  \itemize{
+    \item The print method uses sensible defaults; all ICs are rounded
+    to the nearest 0.1, and IC weights are printed using
+    \code{\link{format.pval}} to print an inequality for
+    values <0.001.
+    \item The computation of degrees of freedom/number of
+    parameters (e.g., whether
+    variance parameters are included in the total) varies enormously
+    between packages.  As long as the df computations
+    for a given set of models is consistent, differences
+    don't matter, but one needs to be careful with log likelihoods
+    and models taken from different packages.  If necessary
+    one can change the degrees of freedom manually by
+    saying \code{attr(obj,"df") <- df.new}, where \code{df.new}
+    is the desired number of parameters.
+    \item For the quasi-AIC methods (\code{type="qAIC"} or
+    \code{type="qAICc"}), the number of parameters is automatically
+    incremented by one to account for the estimated scale/dispersion
+    parameter.
+    \item The defaults for the *ICtab functions are \code{sort=TRUE},
+    \code{base=FALSE}, \code{delta=TRUE}, to match my conviction that
+    it rarely makes sense to report the overall values of information
+    criteria
+  }
+}
 \references{Burnham and Anderson 2002}
 \author{Ben Bolker}
 \examples{

@@ -1,7 +1,7 @@
 
-R Under development (unstable) (2019-12-03 r77509) -- "Unsuffered Consequences"
-Copyright (C) 2019 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+R Under development (unstable) (2026-07-15 r90257) -- "Unsuffered Consequences"
+Copyright (C) 2026 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -25,10 +25,15 @@ Loading required package: stats4
 > 
 > m1 = mle2(z~dpois(lambda=L),start=list(L=4),data=data.frame(z))
 > q1 <- qAICc(m1,nobs=100,dispersion=1.2)
-> qAICc(m1,m1,nobs=100,dispersion=1.2) ## !!
-      AICc df
-1 374.2214  2
-2 374.2214  2
+> q1m <- qAICc(m1,m1,nobs=100,dispersion=1.2)
+> ## GH #22: single- and multi-object qAICc() calls disagreed because the
+> ## single-object branch omitted the "+1 for scale parameter" df adjustment
+> ## that the multi-object branch applied
+> ## IGNORE_RDIFF_BEGIN
+> stopifnot(isTRUE(all.equal(unname(q1), q1m$AICc[1])),
++           isTRUE(all.equal(q1m$AICc[1], q1m$AICc[2])),
++           isTRUE(all.equal(unname(q1), 374.221382320186)))
+> ## IGNORE_RDIFF_END
 > i1 <- ICtab(m1,type="qAICc",dispersion=1.2,nobs=100, base=TRUE)
 > 
 > m2 = glm(z~1,family=poisson)
@@ -54,4 +59,4 @@ Loading required package: stats4
 > 
 > proc.time()
    user  system elapsed 
-  1.636   0.112   1.831 
+  1.418   0.144   1.553 

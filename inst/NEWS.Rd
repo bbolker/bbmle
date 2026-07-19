@@ -22,6 +22,9 @@
       unreliable heuristics (GH #35)
       \item \code{ICtab(type="BIC")} now respects an explicit
       \code{nobs} argument, instead of silently ignoring it (GH #35)
+      \item fixed inconsistent degrees-of-freedom adjustment in
+      \code{qAICc}, which caused \code{qAICc()} on a single object to
+      disagree with \code{qAICc()} on multiple objects (GH #22)
     }
   }
 }

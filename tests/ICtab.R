@@ -5,7 +5,15 @@ z = rpois(100,lambda=5)
 
 m1 = mle2(z~dpois(lambda=L),start=list(L=4),data=data.frame(z))
 q1 <- qAICc(m1,nobs=100,dispersion=1.2)
-qAICc(m1,m1,nobs=100,dispersion=1.2) ## !!
+q1m <- qAICc(m1,m1,nobs=100,dispersion=1.2)
+## GH #22: single- and multi-object qAICc() calls disagreed because the
+## single-object branch omitted the "+1 for scale parameter" df adjustment
+## that the multi-object branch applied
+## IGNORE_RDIFF_BEGIN
+stopifnot(isTRUE(all.equal(unname(q1), q1m$AICc[1])),
+          isTRUE(all.equal(q1m$AICc[1], q1m$AICc[2])),
+          isTRUE(all.equal(unname(q1), 374.221382320186)))
+## IGNORE_RDIFF_END
 i1 <- ICtab(m1,type="qAICc",dispersion=1.2,nobs=100, base=TRUE)
 
 m2 = glm(z~1,family=poisson)

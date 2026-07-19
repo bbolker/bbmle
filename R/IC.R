@@ -204,7 +204,7 @@ ects")
                   val <- -2*logLiks+k*df+k*df*(df+1)/(nobs-df-1)
                   data.frame(AICc=val,df=df)
               } else {
-                  df <- attr(object,"df")
+                  df <- attr(object,"df")+1 ## add one for scale parameter
                   c(-2*logLik(object)/dispersion+k*df+k*df*(df+1)/(nobs-df-1))
               }
           })

@@ -203,7 +203,8 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
                    ## FIXME: add unit test!
                    (is.na(z) || abs(z) < zmax)) {
                        curval <- B0[i] + sgn * step * del * std.err[i]
-                       if ((sgn==-1 & curval<lbound) ||
+                       if (is.nan(curval)) break
+                       if ((sgn==-1 && curval<lbound) ||
                            (sgn==1 && curval>ubound)) {
                            stop_bound <- TRUE;
                            stop_msg[[i]][[dir_ind]] <- paste(stop_msg[[i]][[dir_ind]],wfun("hit bound"))
@@ -244,7 +245,8 @@ proffun <- function (fitted, which = 1:p, maxsteps = 100,
                     ## now let's try a bit harder if we came up short
                     for(dstep in c(0.2, 0.4, 0.6, 0.8, 0.9)) {
                         curval <- B0[i] + sgn * (step-1+dstep) * del * std.err[i]
-                        if ((sgn==-1 & curval<lbound) ||
+                        if (is.nan(curval)) break
+                        if ((sgn==-1 && curval<lbound) ||
                             (sgn==1 && curval>ubound)) break
                         z <- onestep(step - 1 + dstep)
                         if (newpars_found && !try_harder) return(pfit)

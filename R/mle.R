@@ -606,7 +606,7 @@ mle2 <- function(minuslogl,
         oout$maxgrad <-  max(abs(gradvec))
         if (!skip.hessian) {
             if (inherits(ev <- try(eigen(oout$hessian)$values,silent=TRUE),
-                         "troy-error")) ev <- NA
+                         "try-error")) ev <- NA
             oout$eratio <- min(Re(ev))/max(Re(ev))
         }
     }
@@ -857,6 +857,3 @@ strwrapx <- function(x, width = 0.9 * getOption("width"),
     }
     return(y)
 }
-
-
-

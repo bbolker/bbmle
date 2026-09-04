@@ -20,6 +20,7 @@ Imports:
     Matrix,
     mvtnorm
 Suggests:
+    splines,
     emdbook,
     rms,
     ggplot2,
